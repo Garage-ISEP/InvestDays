@@ -6,6 +6,8 @@ export default function Footer() {
   return (
     <div className={footerStyles.container}>
       <Partners />
+            <span> En cas de problème, contactez-nous à l'adresse : investdays@garageisep.com
+</span>
       <span>
         Rejoindre{" "}
         <a
@@ -17,6 +19,7 @@ export default function Footer() {
         </a>{" "}
       </span>
       <span>Invest Days - v2.0</span>
+
     </div>
   );
 }

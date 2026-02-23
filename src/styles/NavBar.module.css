@@ -251,3 +251,37 @@
 .langBtn:active {
   transform: scale(0.95);
 }
+
+/* --- SECTION GAUCHE : LOGO + NAVIGATION --- */
+.leftSection {
+  display: flex;
+  align-items: center;
+  flex: 1; /* Prend l'espace à gauche pour laisser le centre au milieu */
+}
+
+.logoContainerLeft {
+  margin-right: 30px; /* Espace entre le logo et le bouton Accueil */
+  display: flex;
+  align-items: center;
+}
+
+.navButtonContainer {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  /* flex: 1;  <-- Supprimez ou commentez cette ligne pour éviter que les onglets ne s'étirent trop */
+}
+
+/* --- MISE À JOUR DU CONTAINER --- */
+.navBarContainer {
+  height: 75px;
+  padding-inline: 20px;
+  border-bottom: 1px solid var(--clrUnselected);
+  display: flex;
+  justify-content: space-between; 
+  align-items: center;
+  position: relative;
+}

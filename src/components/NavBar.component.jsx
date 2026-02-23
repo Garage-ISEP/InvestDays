@@ -3,14 +3,14 @@ import navBarStyles from "../styles/NavBar.module.css";
 import NavTab from "./NavTab.component";
 import { useAuthentification } from "../context/AuthContext";
 import { useWallet } from "../context/WalletContext";
-import { useLanguage } from "../context/LanguageContext"; // Utilisation du nouveau context
+import { useLanguage } from "../context/LanguageContext";
 import Image from "next/image";
 import Link from "next/link";
 
 function Navbar() {
   const { logout, user } = useAuthentification();
   const { wallets, selectedId, selectWallet } = useWallet();
-  const { lang, toggleLanguage } = useLanguage(); // Récupération de l'état global
+  const { lang, toggleLanguage } = useLanguage();
   const [active, setActive] = useState("accueil");
   const [menu, setMenu] = useState(false);
 
@@ -21,18 +21,24 @@ function Navbar() {
   return (
     <nav className={navBarStyles.navBarContainer}>
       
-      {/* SECTION GAUCHE : Menu de navigation traduit */}
-      <ul
-        className={`${navBarStyles.navButtonContainer} ${menu ? navBarStyles.isActived : ""}`}
-        onClick={() => setMenu(false)}
-      >
-        <NavTab handleToggle={setActive} active={active} id="accueil" title={lang === "fr" ? "Accueil" : "Home"} to="/" />
-        <NavTab handleToggle={setActive} active={active} id="wallet" title={lang === "fr" ? "Portefeuille" : "Wallet"} to="/wallet" />
-        <NavTab handleToggle={setActive} active={active} id="market" title={lang === "fr" ? "Marchés" : "Markets"} to="/market" />
-        <NavTab handleToggle={setActive} active={active} id="ranking" title={lang === "fr" ? "Classement" : "Ranking"} to="/ranks" />
-      </ul>
+      <div className={navBarStyles.leftSection}>
+        <div className={navBarStyles.logoContainerLeft}>
+          <Link href={"/"}>
+            <Image src="/assets/INVEST.png" width={80} height={120} alt="logo" priority />
+          </Link>
+        </div>
 
-      {/* SECTION CENTRALE : Sélecteur de Portfolio */}
+        <ul
+          className={`${navBarStyles.navButtonContainer} ${menu ? navBarStyles.isActived : ""}`}
+          onClick={() => setMenu(false)}
+        >
+          <NavTab handleToggle={setActive} active={active} id="accueil" title={lang === "fr" ? "Accueil" : "Home"} to="/" />
+          <NavTab handleToggle={setActive} active={active} id="wallet" title={lang === "fr" ? "Portefeuille" : "Wallet"} to="/wallet" />
+          <NavTab handleToggle={setActive} active={active} id="market" title={lang === "fr" ? "Marchés" : "Markets"} to="/market" />
+          <NavTab handleToggle={setActive} active={active} id="ranking" title={lang === "fr" ? "Classement" : "Ranking"} to="/ranks" />
+        </ul>
+      </div>
+
       {user && wallets && (
         <div className={navBarStyles.centerSection}>
           <div className={navBarStyles.portfolioBadge}>
@@ -59,10 +65,7 @@ function Navbar() {
         </div>
       )}
 
-      {/* SECTION DROITE : Langue | Email | Logo | Déco */}
       <div className={navBarStyles.rightSection}>
-        
-        {/* BOUTON DE CHANGEMENT DE LANGUE GLOBAL */}
         <button 
           className={navBarStyles.langBtn} 
           onClick={toggleLanguage}
@@ -77,14 +80,8 @@ function Navbar() {
           </div>
         )}
         
-        <div className={navBarStyles.logoContainer}>
-          <Link href={"/"}>
-            <Image src="/assets/INVEST.png" width={80} height={120} alt="logo" priority />
-          </Link>
-        </div>
-
         <div className={navBarStyles.logoutBtn} onClick={() => logout()}>
-          <Image src="/assets/deco.png" width={35} height={35} alt="Déconnexion" />
+          <Image src="/assets/deco6.png" width={30} height={30} alt="Déconnexion" />
         </div>
       </div>
 
