@@ -1,5 +1,4 @@
 import { expressjwt } from "express-jwt";
-const util = require("util");
 
 function jwtMiddleware(req, res) {
   if (!process.env.JWT_SECRET) {
@@ -16,7 +15,12 @@ function jwtMiddleware(req, res) {
     ],
   });
 
-  return util.promisify(middleware)(req, res);
+  return new Promise((resolve, reject) => {
+    middleware(req, res, (err) => {
+      if (err) return reject(err);
+      resolve();
+    });
+  });
 }
 
 export { jwtMiddleware };
