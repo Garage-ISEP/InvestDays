@@ -11,7 +11,7 @@ export default function Footer() {
       <span>
         Rejoindre{" "}
         <a
-          href="https://discord.gg/smw2CSHvCW"
+          href="https://discord.gg/hstvfHKP"
           target="_blank"
           rel="noreferrer"
         >
