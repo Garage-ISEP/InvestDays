@@ -30,7 +30,7 @@ export default function MentionsLegales() {
               <li><strong>Propriétaire :</strong> Garage ISEP – Association étudiante – 28 Rue Notre Dame des Champs, 75006 Paris</li>
               <li><strong>Responsable publication :</strong> Le Bureau du Garage ISEP</li>
               <li><strong>Webmaster :</strong> Équipe technique InvestDays</li>
-              <li><strong>Hébergeur :</strong> [Serveur ISEP]</li>
+              <li><strong>Hébergeur :</strong> Serveur ISEP</li>
             </ul>
           </section>
 

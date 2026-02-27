@@ -1,8 +1,16 @@
 import { StockApi } from "../../types/stockapi.type";
+
 const { API_POLYGON_KEY } = process.env;
 
+// Définition des intervalles acceptés par l'API Polygon/Twelve Data
+export enum times {
+  day = "day",
+  week = "week",
+  month = "month",
+}
+
 async function search(
-  term: String,
+  term: string,
   userId: number,
   ip: string
 ): Promise<StockApi[]> {
@@ -13,25 +21,27 @@ async function search(
   });
   const data = await response.json();
   const matches: StockApi[] = [];
-  for (let stock of data["results"]) {
-    if (
-      stock?.market == "stocks" || // US Stocks
-      stock?.market == "etfs" || // US ETFs
-      stock?.market == "forex" || // Forex
-      stock?.market == "crypto"
-    ) {
+
+  if (data["results"]) {
+    for (let stock of data["results"]) {
       if (
-        (stock?.currency_symbol &&
-          stock?.currency_symbol.toUpperCase() == "USD") ||
-        (stock?.currency_name && stock?.currency_name?.toUpperCase() == "USD")
+        stock?.market == "stocks" || 
+        stock?.market == "etfs" || 
+        stock?.market == "forex" || 
+        stock?.market == "crypto"
       ) {
-        matches.push({
-          symbol: stock["ticker"],
-          name: stock["name"],
-          market: stock["market"],
-          region: stock["locale"],
-          currency: stock["currency_name"],
-        });
+        if (
+          (stock?.currency_symbol && stock?.currency_symbol.toUpperCase() == "USD") ||
+          (stock?.currency_name && stock?.currency_name?.toUpperCase() == "USD")
+        ) {
+          matches.push({
+            symbol: stock["ticker"],
+            name: stock["name"],
+            market: stock["market"],
+            region: stock["locale"],
+            currency: stock["currency_name"],
+          });
+        }
       }
     }
   }
@@ -40,55 +50,42 @@ async function search(
 }
 
 function createHeader(userId: string, ip: string) {
-  // Headers required to use the Launchpad product.
-  const edgeHeaders = {
-    // X-Polygon-Edge-ID is a required Launchpad header. It identifies the Edge User requesting data.
+  return {
     "X-Polygon-Edge-ID": `${userId}`,
-    // X-Polygon-Edge-IP-Address is a required Launchpad header. It denotes the originating IP Address of the Edge User requesting data.
     "X-Polygon-Edge-IP-Address": `${ip}`,
-    // X-Polygon-Edge-User-Agent is an optional Launchpad header. It denotes the originating UserAgent of the Edge User requesting data.
     "X-Polygon-Edge-User-Agent": "*",
   };
-
-  return edgeHeaders;
 }
 
-enum times {
-  day = "1d" as any,
-  week = "1w" as any,
-  month = "1m" as any,
-}
 async function getRecentPrices(
   symbol: string,
   time: times = times.day,
   userId: number,
   ip: string,
   isCrypto?: boolean
-): Promise<any[]> {
-  let url = "";
-  // Récupérer la date d'aujourd'hui
+): Promise<any> {
   let today = new Date();
   let daybegining = new Date();
   daybegining.setDate(today.getDate() - 2 * 365);
 
   let formatedToday = today.toISOString().slice(0, 10);
   let formatedBeginingDate = daybegining.toISOString().slice(0, 10);
-  url = `https://api.polygon.io/v2/aggs/ticker/${symbol}/range/1/${times[time]}/${formatedBeginingDate}/${formatedToday}?adjusted=true&sort=asc&limit=10000&apiKey=${API_POLYGON_KEY}`;
+
+  const url = `https://api.polygon.io/v2/aggs/ticker/${symbol}/range/1/${time}/${formatedBeginingDate}/${formatedToday}?adjusted=true&sort=asc&limit=10000&apiKey=${API_POLYGON_KEY}`;
+
   const response = await fetch(url, {
     method: "GET",
     headers: createHeader(userId as unknown as string, ip as unknown as string),
   });
 
-  const data = await response.json();
-
-  return data;
+  return await response.json();
 }
 
 async function getDetailsStock(
   symbol: string,
   userId: number,
   ip: string
-): Promise<any[]> {
+): Promise<any> {
   let url = "";
   if (symbol.startsWith("X:")) {
     url = `https://api.polygon.io/v1/summaries?ticker.any_of=${symbol}&apiKey=${API_POLYGON_KEY}`;
@@ -101,29 +98,24 @@ async function getDetailsStock(
     headers: createHeader(userId as unknown as string, ip as unknown as string),
   });
 
-  const data = await response.json();
-
-  return data;
+  return await response.json();
 }
 
 async function getLogoStock(
   link: string,
   userId: number,
   ip: string
-): Promise<any> {
-  let url = `${link}` + `?apiKey=${API_POLYGON_KEY}`;
+): Promise<string> {
+  const url = `${link}?apiKey=${API_POLYGON_KEY}`;
 
   const response = await fetch(url, {
     method: "GET",
     headers: createHeader(userId as unknown as string, ip as unknown as string),
   });
 
-  const svg = await response.text();
-
-  return svg;
+  return await response.text();
 }
 
-// Dans stocks.service.ts, fonction getLastPrice
 async function getLastPrice(
   symbol: string,
   userId: number,
@@ -131,20 +123,24 @@ async function getLastPrice(
 ): Promise<any> {
   const url = `https://api.polygon.io/v2/aggs/ticker/${symbol}/prev?adjusted=true&apiKey=${API_POLYGON_KEY}`;
 
-  const response = await fetch(url, {
-    method: "GET",
-    headers: {},
-  });
+  try {
+    const response = await fetch(url, {
+      method: "GET",
+      headers: createHeader(userId as unknown as string, ip as unknown as string),
+    });
 
-  const data = await response.json();
+    const data = await response.json();
 
-  if (data.results && data.results.length > 0) {
-    return {
-      results: [{
-        price: data.results[0].c,
-        symbol: symbol,
-      }]
-    };
+    if (data && data.results && data.results.length > 0) {
+      return {
+        results: [{
+          price: data.results[0].c,
+          symbol: symbol,
+        }]
+      };
+    }
+  } catch (error) {
+    console.error("Erreur getLastPrice:", error);
   }
 
   return { results: [] };
@@ -157,4 +153,5 @@ const stocksService = {
   getLastPrice,
   getLogoStock,
 };
+
 export default stocksService;
