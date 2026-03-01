@@ -84,13 +84,13 @@ export default function Home() {
             <a href="https://finage.co.uk"
             target="_blank"
             rel="noopener noreferrer"
-            style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', marginRight: '-50px', overflow: 'hidden' }}
+            style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', marginRight: '50px', overflow: 'hidden' }}
           >
             <NextImage
-              src="/assets/partners/twelve_data.svg"
+              src="/assets/partners/finage_logo.svg"
               alt="Finage Logo"
-              width={385}
-              height={110}
+              width={175}
+              height={50}
               style={{ objectFit: 'contain', display: 'block' }}
             />
           </a>
