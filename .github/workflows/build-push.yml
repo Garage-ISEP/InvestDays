@@ -60,6 +60,7 @@ jobs:
           script: |
             cd /srv/investdays
             echo "${{ secrets.ENV_FILE }}" > .env
+            docker compose down -v
             docker compose down
             docker compose pull app
             docker compose up -d
