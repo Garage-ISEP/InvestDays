@@ -1,29 +1,28 @@
 import Head from "next/head";
 import Image from "next/image";
-import { AppProps } from "next/app";
 import { useEffect, useState } from "react";
 import { useFetch } from "../../context/FetchContext.js";
 import { useWallet } from "../../context/WalletContext";
-import { useLanguage } from "../../context/LanguageContext"; // Import du context global
+import { useLanguage } from "../../context/LanguageContext";
 
 import homeStyles from "../../styles/Home.module.css";
 import marketStyles from "../../styles/Market.module.css";
 import TableSearch from "../../components/TableSearch.component.jsx";
 import DashBoardLayout from "../../components/layouts/DashBoard.layout";
 
+
 export default function Market() {
   const { wallets, selectedId, selectWallet } = useWallet();
-  const { lang } = useLanguage(); // Récupération de la langue globale
+  const { lang } = useLanguage(); 
   const [data, setData] = useState([] as any);
   const [input, setInput] = useState("");
   const fetch = useFetch();
 
-  // Traductions de la page Marchés
   const translations = {
     fr: {
       headTitle: "InvestTrade - Marchés",
       title: "Marchés",
-      sub: "Recherchez des valeurs sans saturer l'API",
+      sub: "Recherchez et analysez les actions en temps réel via Finage",
       cashLabel: "Disponible",
       portfolioLabel: "Portfolio n°",
       placeholder: "Tapez le nom d'une entreprise...",
@@ -32,7 +31,7 @@ export default function Market() {
     en: {
       headTitle: "InvestTrade - Markets",
       title: "Markets",
-      sub: "Search for stocks without saturating the API",
+      sub: "Search and analyze stocks in real-time via Finage",
       cashLabel: "Available",
       portfolioLabel: "Portfolio #",
       placeholder: "Type a company name...",
@@ -40,8 +39,7 @@ export default function Market() {
     }
   };
 
-  // Sécurisation du typage pour TypeScript
-  const t = translations[lang as keyof typeof translations];
+  const t = translations[lang as keyof typeof translations] || translations.fr;
 
   const defaultStocks = [
     { symbol: "AAPL", name: "Apple Inc." },
@@ -60,8 +58,8 @@ export default function Market() {
     const delayDebounceFn = setTimeout(() => {
       if (input.trim().length > 1) {
         fetch.get("/api/stock/search?term=" + input)
-          .then((data) => setData(data))
-          .catch((err) => console.error("API Limit reached or Error:", err));
+          .then((results) => setData(results))
+          .catch((err) => console.error("Search Error:", err));
       } else if (input === "") {
         setData([]);
       }
@@ -92,22 +90,22 @@ export default function Market() {
       </Head>
 
       <main className={homeStyles.pageContainer}>
-        <div className={homeStyles.marketHeader}>
+        <div className={homeStyles.marketHeader} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
           <div>
             <h1 className={homeStyles.marketTitle}>{t.title}</h1>
             <p className={homeStyles.marketSub}>{t.sub}</p>
           </div>
 
-          <div className={homeStyles.statCard} style={{ display: 'flex', alignItems: 'center', padding: '10px 20px' }}>
+          <div className={homeStyles.statCard} style={{ display: 'flex', alignItems: 'center', padding: '12px 25px', backgroundColor: '#fff', borderRadius: '12px', boxShadow: '0 2px 10px rgba(0,0,0,0.05)' }}>
             <Image src="/assets/cash.svg" width={25} height={25} alt="cash" style={{ marginRight: '12px' }} />
             <div>
-              <span style={{ fontSize: '11px', color: '#888', display: 'block' }}>{t.cashLabel}</span>
-              <span style={{ fontWeight: '700' }}>{(wallets[selectedId]?.cash || 0).toFixed(2)} $</span>
+              <span style={{ fontSize: '11px', color: '#888', display: 'block', textTransform: 'uppercase' }}>{t.cashLabel}</span>
+              <span style={{ fontWeight: '700', fontSize: '18px' }}>{(wallets[selectedId]?.cash || 0).toLocaleString()} $</span>
             </div>
           </div>
         </div>
 
-        <div className={homeStyles.filterBar}>
+        <div className={homeStyles.filterBar} style={{ marginBottom: '30px' }}>
           {wallets.map((_, index) => (
             <button
               key={index}
@@ -119,22 +117,24 @@ export default function Market() {
           ))}
         </div>
 
-        <div className={marketStyles.searchInput} style={{ width: '100%', maxWidth: '500px', margin: '0 auto 30px' }}>
-          <div style={{ borderRadius: '12px', border: '2px solid #f3ca3e', backgroundColor: 'white' }}>
+        <div className={marketStyles.searchInput} style={{ width: '100%', maxWidth: '600px', margin: '0 auto 40px' }}>
+          <div style={{ borderRadius: '15px', border: '2px solid #f3ca3e', backgroundColor: 'white', display: 'flex', alignItems: 'center', padding: '0 15px', gap: '10px' }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#aaa" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
             <input
-              className={marketStyles.formSubmit}
               type="text"
               placeholder={t.placeholder}
               value={input}
               onChange={onChange}
               onKeyDown={handleKeyDown}
-              style={{ height: '45px', border: 'none' }}
+              style={{ height: '50px', border: 'none', width: '100%', paddingLeft: '0', outline: 'none', fontSize: '16px', backgroundColor: 'transparent' }}
             />
           </div>
         </div>
 
-        <div className={homeStyles.assetCard} style={{ padding: '20px' }}>
-          {/* Passage de la langue au tableau de recherche */}
+        <div className={homeStyles.assetCard} style={{ padding: '0', overflow: 'hidden', borderRadius: '15px' }}>
           <TableSearch data={list} lang={lang} />
         </div>
       </main>

@@ -2,27 +2,27 @@ import Head from "next/head";
 import Image from "next/image";
 import homeStyles from "../../styles/Home.module.css";
 import DashBoardLayout from "../../components/layouts/DashBoard.layout";
-import { AppProps } from "next/app";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useFetch } from "../../context/FetchContext.js";
 import Popup from "../../components/Popup.component.jsx";
 import { Request } from "../../types/request.type";
 import { useWallet } from "../../context/WalletContext";
-import { useLanguage } from "../../context/LanguageContext"; // Import du contexte global
+import { useLanguage } from "../../context/LanguageContext"; 
 import Highcharts from "highcharts/highstock";
 import HighchartsReact from "highcharts-react-official";
 import { useAuthentification } from "../../context/AuthContext";
 
 export default function DetailAction(req: Request) {
   const [logo, setLogo] = useState("");
-  const [data, setData] = useState([] as any);
+  const [data, setData] = useState<any>({ results: [] });
   const [isOpen, setIsOpen] = useState(false);
-  const [detail, setDetail] = useState({} as any);
+  const [detail, setDetail] = useState<any>({});
   const [chartReady, setChartReady] = useState(false);
+  
   const { user, isAuthenticated } = useAuthentification();
   const { wallets, selectedId, getPrice } = useWallet();
-  const { lang } = useLanguage(); // Utilisation de la langue globale
+  const { lang } = useLanguage();
   const router = useRouter();
   const { nameAction } = router.query;
   const fetch = useFetch();
@@ -33,27 +33,34 @@ export default function DetailAction(req: Request) {
     number: "-",
   });
 
-  // Traductions de la page Détail
   const translations = {
     fr: {
       cashLabel: "Cash (P.",
       buyBtn: "Acheter",
-      capLabel: "Capitalisation boursière",
-      sharesLabel: "Actions en circulation",
       popTitle: "Acheter",
-      popSub: "Achat d'actions"
+      popSub: "Achat d'actions",
+      loading: "Chargement du graphique..."
     },
     en: {
       cashLabel: "Cash (P.",
       buyBtn: "Buy",
-      capLabel: "Market Capitalization",
-      sharesLabel: "Shares Outstanding",
       popTitle: "Buy",
-      popSub: "Purchase shares"
+      popSub: "Purchase shares",
+      loading: "Loading chart..."
     }
   };
 
-  const t = translations[lang as keyof typeof translations]; // Cast TypeScript
+  const t = translations[lang as keyof typeof translations] || translations.fr;
+
+    const chartData = useMemo(() => {
+        if (data?.results && Array.isArray(data.results)) {
+          return data.results.map((i: any) => {
+            const timestamp = Number(i.t);
+            return [timestamp, i.c];
+          });
+        }
+        return [];
+      }, [data]);
 
   useEffect(() => {
     const loadExporting = async () => {
@@ -88,19 +95,25 @@ export default function DetailAction(req: Request) {
         fetchLogo(response.results.branding.logo_url);
       }
     } catch (error) {
-      console.log(error);
+      console.error("Error fetching detail:", error);
     }
   }
 
   async function fetchLogo(url: string) {
-    const logoData = await fetch.get("/api/stock/getLogo?url=" + url, true);
-    setLogo(logoData);
+    try {
+      const logoData = await fetch.get("/api/stock/getLogo?url=" + url, true);
+      setLogo(logoData);
+    } catch (e) {
+      setLogo("");
+    }
   }
 
   function fetchData(symbol: string) {
     fetch.get("/api/stock/info?symbol=" + symbol)
-      .then((res) => setData(res))
-      .catch((err) => console.log(err));
+      .then((res) => {
+          setData(res || { results: [] });
+      })
+      .catch((err) => console.error("Error fetching chart data:", err));
   }
 
   useEffect(() => {
@@ -113,32 +126,91 @@ export default function DetailAction(req: Request) {
   useEffect(() => {
     if (detail) {
       setDataCleaned({
-        name: detail.name || nameAction,
-        market_cap: detail.market_cap,
-        number: detail.weighted_shares_outstanding,
+        name: detail.name || (nameAction as string) || "-",
+        market_cap: detail.market_cap || "-",
+        number: detail.weighted_shares_outstanding || "-",
       });
     }
-  }, [detail]);
+  }, [detail, nameAction]);
 
-  let options = {
-    chart: { height: 500, backgroundColor: 'transparent' },
+const options = {
+    chart: { 
+      height: 500, 
+      backgroundColor: 'transparent',
+      animation: false 
+    },
+    xAxis: {
+      type: 'datetime',
+      labels: { style: { color: '#888' } },
+      ordinal: true 
+    },
+    yAxis: {
+      labels: {
+        style: { color: '#888' },
+        format: '{value}$'
+      },
+      opposite: true
+    },
     rangeSelector: { 
       enabled: true,
+      selected: 3,
+      inputDateFormat: lang === 'fr' ? '%e %B %Y' : '%B %e, %Y',
+      inputEditDateFormat: '%Y-%m-%d', 
+      inputBoxWidth: 100, 
+      
+      buttonTheme: {
+        fill: 'none',
+        stroke: 'none',
+        r: 8,
+        style: { color: '#888', fontWeight: '600' },
+        states: {
+          select: {
+            fill: '#f3ca3e',
+            style: { color: '#000' }
+          }
+        }
+      },
+      inputStyle: {
+        color: '#f3ca3e',
+        fontWeight: '700',
+        fontSize: '13px'
+      },
+      labelStyle: {
+        color: '#888',
+        textTransform: 'uppercase',
+        fontSize: '10px'
+      },
       buttons: lang === "fr" ? [
         { type: 'month', count: 1, text: '1m' },
         { type: 'month', count: 3, text: '3m' },
         { type: 'year', count: 1, text: '1an' },
         { type: 'all', text: 'Tout' }
-      ] : undefined // Utilise les défauts anglais de Highcharts
+      ] : [
+        { type: 'month', count: 1, text: '1m' },
+        { type: 'month', count: 3, text: '3m' },
+        { type: 'year', count: 1, text: '1y' },
+        { type: 'all', text: 'All' }
+      ]
     },
-    title: { text: null },
+    plotOptions: {
+      series: {
+        animation: false,
+        dataGrouping: { enabled: true }
+      }
+    },
     series: [{
-      name: nameAction,
-      data: data.results?.map((i: any) => [i.t, i.c]) || [],
+      name: nameAction || "Stock",
+      data: chartData,
       color: '#f3ca3e',
-      tooltip: { valueDecimals: 2 }
-    }]
-  };
+      tooltip: { 
+        valueDecimals: 2,
+        xDateFormat: lang === 'fr' ? '%A %e %B %Y' : '%A, %b %e, %Y'
+      }
+    }],
+    navigator: { enabled: true },
+    scrollbar: { enabled: false },
+    credits: { enabled: false }
+};
 
   return (
     <>
@@ -151,7 +223,9 @@ export default function DetailAction(req: Request) {
           <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
              <div>
                 <h1 className={homeStyles.marketTitle}>{dataCleaned.name}</h1>
-                <p className={homeStyles.marketSub}>{nameAction} • {detail.price?.toFixed(2)}$</p>
+                <p className={homeStyles.marketSub}>
+                  {nameAction} • {detail?.price ? `${detail.price.toFixed(2)}$` : "- $"}
+                </p>
              </div>
           </div>
 
@@ -162,7 +236,9 @@ export default function DetailAction(req: Request) {
                 <span style={{ fontSize: '11px', color: '#888', display: 'block' }}>
                   {t.cashLabel}{selectedId + 1})
                 </span>
-                <span style={{ fontWeight: '700' }}>{(wallets[selectedId]?.cash || 0).toFixed(2)} $</span>
+                <span style={{ fontWeight: '700' }}>
+                  {wallets[selectedId]?.cash ? wallets[selectedId].cash.toFixed(2) : "0.00"} $
+                </span>
               </div>
             </div>
             <button 
@@ -175,36 +251,26 @@ export default function DetailAction(req: Request) {
           </div>
         </div>
 
-        <div className={homeStyles.assetCard} style={{ marginBottom: '30px', padding: '20px' }}>
-          {chartReady && data.results && (
+        <div className={homeStyles.assetCard} style={{ marginBottom: '30px', padding: '20px', minHeight: '500px' }}>
+          {chartReady && chartData.length > 0 ? (
             <HighchartsReact
+              key={`chart-${lang}-${nameAction}-${chartData.length}`} 
               highcharts={Highcharts}
               constructorType={"stockChart"}
               options={options}
             />
+          ) : (
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '400px', color: '#888' }}>
+              {t.loading}
+            </div>
           )}
-        </div>
-
-        <div className={homeStyles.summaryGrid} style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '20px' }}>
-          <div className={homeStyles.statCard} style={{ padding: '20px' }}>
-            <span style={{ color: '#888', fontSize: '14px' }}>{t.capLabel}</span>
-            <div style={{ fontSize: '24px', fontWeight: '800', marginTop: '5px' }}>
-              {format(dataCleaned.market_cap)} $
-            </div>
-          </div>
-          <div className={homeStyles.statCard} style={{ padding: '20px' }}>
-            <span style={{ color: '#888', fontSize: '14px' }}>{t.sharesLabel}</span>
-            <div style={{ fontSize: '24px', fontWeight: '800', marginTop: '5px' }}>
-              {format(dataCleaned.number)}
-            </div>
-          </div>
         </div>
 
         <Popup
           title={t.popTitle}
           subtitle={`${t.popSub} ${nameAction}`}
-          maxCount={detail.price ? Math.floor((wallets[selectedId]?.cash || 0) / detail.price) : 0}
-          symbol={nameAction}
+          maxCount={detail?.price ? Math.floor((wallets[selectedId]?.cash || 0) / detail.price) : 0}
+          symbol={nameAction as string}
           sell={false}
           open={isOpen}
           close={() => setIsOpen(false)}

@@ -36,6 +36,16 @@ function Navbar() {
           <NavTab handleToggle={setActive} active={active} id="wallet" title={lang === "fr" ? "Portefeuille" : "Wallet"} to="/wallet" />
           <NavTab handleToggle={setActive} active={active} id="market" title={lang === "fr" ? "Marchés" : "Markets"} to="/market" />
           <NavTab handleToggle={setActive} active={active} id="ranking" title={lang === "fr" ? "Classement" : "Ranking"} to="/ranks" />
+          
+          {user && user.admin && (
+            <NavTab 
+              handleToggle={setActive} 
+              active={active} 
+              id="admin" 
+              title={lang === "fr" ? "Admin 🔒" : "Admin 🔒"} 
+              to="/admin" 
+            />
+          )}
         </ul>
       </div>
 

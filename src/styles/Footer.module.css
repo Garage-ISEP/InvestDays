@@ -1,10 +1,68 @@
 .container {
+  background-color: #ffff;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  padding: 3rem 8% 1.5rem 8%;
+  color: #444;
+}
+
+.content {
+  display: flex;
+  justify-content: space-between;
+  gap: 40px;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
+
+.descriptionSection {
+  flex: 2;
+  min-width: 300px;
+}
+
+.twelveDataText {
+  font-size: 13px;
+  line-height: 1.6;
+  color: #666;
+  text-align: justify;
+}
+
+.linksSection {
+  flex: 1;
+  display: flex;
+  gap: 50px;
+  min-width: 250px;
+}
+
+.linkGroup {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  gap: 10px;
+}
+
+.linkGroup h4 {
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #000;
+  margin-bottom: 10px;
+}
+
+.linkGroup a {
+  font-size: 14px;
+  color: #666;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.linkGroup a:hover {
+  color: #f3ca3e; 
+}
+
+.bottomBar {
+  display: flex;
+  justify-content: space-between;
   align-items: center;
-  padding: 1rem;
-  margin-top: 0; 
-  background-color: #ffffff; 
+  padding-top: 1.5rem;
   border-top: 1px solid rgba(0, 0, 0, 0.05);
+  font-size: 12px;
+  color: #888;
 }

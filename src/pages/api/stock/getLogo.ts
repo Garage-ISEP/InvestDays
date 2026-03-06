@@ -5,7 +5,6 @@ import { Request } from "../../../types/request.type";
 import requestIp from "request-ip";
 //import stocksService from "../../../services/stocks/stocks.service";
 
-// you can use the api now
 
 export default apiHandler(getLogo);
 
@@ -15,7 +14,6 @@ async function getLogo(req: Request, res: NextApiResponse<any>) {
   }
   const { url } = req.query;
 
-  //get ip address from request;
   const clientIp = requestIp.getClientIp(req);
 
   if (typeof url != "string") throw "Invalid request";
@@ -25,9 +23,11 @@ async function getLogo(req: Request, res: NextApiResponse<any>) {
     clientIp as string
   );
 
-  //return response as text
   res.statusCode = 200;
-  res.setHeader("Content-Type", "image/svg+xml");
+  const contentType = url.endsWith(".png") ? "image/png" 
+    : url.endsWith(".jpg") ? "image/jpeg" 
+    : "image/svg+xml";
+  res.setHeader("Content-Type", contentType);
   res.setHeader(
     "Cache-Control",
     "public, immutable, no-transform, s-maxage=31536000, max-age=31536000"

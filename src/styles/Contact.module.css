@@ -1,0 +1,151 @@
+.contactGrid {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 30px;
+  margin-top: 20px;
+}
+
+.formCard {
+  background: white;
+  padding: 40px;
+  border-radius: 12px;
+  border: 1px solid #f0f0f0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+}
+
+.inputGroup {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.inputGroup label {
+  font-weight: 700;
+  font-size: 14px;
+  color: #333;
+}
+
+.inputGroup input, .inputGroup select, .inputGroup textarea {
+  padding: 12px;
+  border: 2px solid #f0f0f0;
+  border-radius: 8px;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+
+.inputGroup input:focus {
+  border-color: #f3ca3e; /* Jaune InvestDays */
+  outline: none;
+}
+
+.infoSidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.infoBox {
+  background: #fffdf2;
+  padding: 30px;
+  border-radius: 12px;
+  border: 1px solid rgba(243, 202, 62, 0.3);
+}
+
+.infoBox h3 {
+  margin-top: 0;
+  font-size: 18px;
+  color: #000;
+}
+
+.emailLink {
+  color: #000;
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+.discordBtn {
+  display: inline-block;
+  margin-top: 10px;
+  background: #5865F2; /* Couleur Discord */
+  color: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .contactGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+.sectionTitle {
+  margin-top: 0;
+  margin-bottom: 25px;
+  font-size: 22px;
+  border-bottom: 3px solid #f3ca3e; /* Rappel du jaune InvestDays */
+  display: inline-block;
+}
+
+.addressBlock h3 {
+  color: #000;
+  margin-bottom: 10px;
+}
+
+.addressText {
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.transportList {
+  list-style: none;
+  padding: 0;
+  font-size: 14px;
+}
+
+.transportList li {
+  margin-bottom: 5px;
+  color: #666;
+}
+
+.separator {
+  margin: 30px 0;
+  border: 0;
+  border-top: 1px solid #eee;
+}
+
+.phoneText {
+  font-size: 18px;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.addressGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.inputRow {
+  display: flex;
+  gap: 15px;
+}
+
+.statusMsg {
+  margin-bottom: 15px;
+  font-weight: 600;
+  padding: 10px;
+  background: #fdfdfd;
+  border-radius: 5px;
+}
+
+@media (max-width: 900px) {
+  .addressGrid {
+    grid-template-columns: 1fr;
+  }
+}

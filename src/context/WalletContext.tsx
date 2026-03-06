@@ -52,7 +52,6 @@ const WalletContext = createContext<WalletContext>({
   },
 });
 
-// Create a provider for components to consume and subscribe to changes
 const WalletProvider = ({ children }: { children: any }) => {
   const fetch = useFetch();
   const { isAuthenticated, user } = useAuthentification();
@@ -66,10 +65,10 @@ const WalletProvider = ({ children }: { children: any }) => {
   >([]);
   const [walletsLines, setWalletsLines] = useState<any>({});
   const [selectedId, setSelectedId] = useState(0);
-  const [assetsCached, setAssetsCached] = useState(0); // {symbol: {value: 123, date: 123456789}
+  const [assetsCached, setAssetsCached] = useState(0); 
   const [valuesCached, setValuesCached] = useState<{
     [key: string]: { value: number; date: number };
-  }>({}); // {symbol: {value: 123, date: 123456789}}
+  }>({}); 
   const valuesCachedRef = useRef(valuesCached);
   valuesCachedRef.current = valuesCached;
   async function actualiseWallets(walletId: number) {}
@@ -116,10 +115,6 @@ const WalletProvider = ({ children }: { children: any }) => {
     if (wallet) calculateAssets();
   }
   async function getRealLines(transactions: any) {
-    //create a function to get the quantity of each symbol in the wallet and return an array of objects with symbol and quantity
-    //in the quantity, if the transaction is a sell order, the quantity is negative
-    // if the quantity is 0, the symbol is not in the wallet
-    //if the status is not executed, the transaction is not taken into account
 
     let acc: any = [];
     transactions.forEach((transaction: any) => {
@@ -155,39 +150,36 @@ const WalletProvider = ({ children }: { children: any }) => {
         }
       }
     });
-    //remove the symbols with a quantity less than 0.000000001
     acc = acc.filter((item: any) => item.quantity > 0.000000001);
-    //acc = acc.filter((item: any) => item.quantity !== 0);
 
     return acc;
   }
   async function getPrice(symbol: string): Promise<number> {
-    try {
-      // Check if value is cached and less than 10 seconds old
-      if (
-        valuesCachedRef.current[symbol] &&
-        valuesCachedRef.current[symbol].date > Date.now() - 10000
-      ) {
-        console.log("from cache");
-        return valuesCachedRef.current[symbol].value;
-      }
-      const response = await fetch.get("/api/stock/lastPrice?symbol=" + symbol);
+      try {
+        if (
+          valuesCachedRef.current[symbol] &&
+          valuesCachedRef.current[symbol].date > Date.now() - 10000
+        ) {
+          return valuesCachedRef.current[symbol].value;
+        }
 
-      setValuesCached((value) => {
-        return {
-          ...value,
-          [symbol]: {
-            value: response,
-            date: Date.now(),
-          },
-        };
-      });
-      return response;
-    } catch (error) {
-      console.log("error", error);
-      return 0;
+        const response = await fetch.get("/api/stock/lastPrice?symbol=" + symbol);
+        const validPrice = typeof response === 'number' ? response : 0;
+
+        setValuesCached((prev) => {
+          return {
+            ...prev,
+            [symbol]: {
+              value: validPrice,
+              date: Date.now(),
+            },
+          };
+        });
+        return validPrice;
+      } catch (error) {
+        return 0; 
+      }
     }
-  }
   async function fillLines(lines: any, walletId: number) {
     lines.forEach((transaction: any) => {
       getPrice(transaction.symbol);
@@ -198,10 +190,6 @@ const WalletProvider = ({ children }: { children: any }) => {
     if (walletId === selectedId) return;
     setSelectedId(walletId);
     actualiseWallets(walletId);
-    // if (walletsLines[walletId]) {
-    //   let newWalletList = await actualiseWallets(walletId);
-    //   if (newWalletList.length >= walletId + 1) return;
-    // }
     refreshWallets(walletId);
   }
   async function refreshWallets(walletId: number | null = null) {
@@ -213,12 +201,10 @@ const WalletProvider = ({ children }: { children: any }) => {
   }
 
   useEffect(() => {
-    // actualise selected wallet every 10 seconds
     if (!isAuthenticated || !user) return;
 
     const interval = setInterval(() => {
       refreshWallets();
-      // console.log("cashed", valuesCachedRef.current);
     }, 4000);
     return () => clearInterval(interval);
   }, [isAuthenticated]);

@@ -13,20 +13,27 @@ async function info(req: Request, res: NextApiResponse<any>) {
   if (req.method !== "GET") {
     throw `Method ${req.method} not allowed`;
   }
-  const { symbol, time, isCrypto } = req.query;
+  const { symbol, time } = req.query; // On récupère l'intervalle envoyé par le front
 
-  //get ip address from request;
   const clientIp = requestIp.getClientIp(req);
-
   if (typeof symbol != "string") throw "Invalid request";
-  enum times {
-    day = "1d" as any,
-    week = "1w" as any,
-    month = "1m" as any,
-  }
+
+  // Correction : On fait correspondre tes boutons (1d, 1w) aux termes de Twelve Data
+  const timeMapping: { [key: string]: string } = {
+    "1d": "day",
+    "1w": "week",
+    "1m": "month",
+    "day": "day",
+    "week": "week",
+    "month": "month"
+  };
+
+  // On utilise la valeur mappée, ou "day" par défaut
+  const selectedInterval = timeMapping[time as string] || "day";
+
   const resp = await stocksService.getRecentPrices(
     symbol.toUpperCase(),
-    time as unknown as times,
+    selectedInterval as any, // On envoie "day", "week" ou "month"
     req.auth.sub,
     clientIp as string,
     false,

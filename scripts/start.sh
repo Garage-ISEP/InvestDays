@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 
-required_vars="DATABASE_URL JWT_SECRET API_POLYGON_KEY SMTP_HOST SMTP_PORT SMTP_USER SMTP_PASS"
+required_vars="DATABASE_URL JWT_SECRET FINAGE_API_KEY SMTP_HOST SMTP_PORT SMTP_USER SMTP_PASS"
 for var in $required_vars; do
   eval val=\$$var
   if [ -z "$val" ]; then
