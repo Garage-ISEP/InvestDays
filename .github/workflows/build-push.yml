@@ -64,4 +64,4 @@ jobs:
             docker compose pull app
             docker compose up -d
             sleep 15
-            docker compose -f docker_compose.yml logs app --tail=50
+            docker compose logs app --tail=50
