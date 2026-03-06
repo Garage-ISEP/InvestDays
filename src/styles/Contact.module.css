@@ -35,7 +35,7 @@
 }
 
 .inputGroup input:focus {
-  border-color: #f3ca3e; /* Jaune InvestDays */
+  border-color: #f3ca3e;
   outline: none;
 }
 
@@ -67,7 +67,7 @@
 .discordBtn {
   display: inline-block;
   margin-top: 10px;
-  background: #5865F2; /* Couleur Discord */
+  background: #5865F2;
   color: white;
   padding: 10px 20px;
   border-radius: 8px;
@@ -75,18 +75,11 @@
   font-weight: 600;
 }
 
-@media (max-width: 768px) {
-  .contactGrid {
-    grid-template-columns: 1fr;
-  }
-}
-
-
 .sectionTitle {
   margin-top: 0;
   margin-bottom: 25px;
   font-size: 22px;
-  border-bottom: 3px solid #f3ca3e; /* Rappel du jaune InvestDays */
+  border-bottom: 3px solid #f3ca3e;
   display: inline-block;
 }
 
@@ -144,8 +137,97 @@
   border-radius: 5px;
 }
 
+/* ─────────────────────────────────────────
+   RESPONSIVE — Tablette (≤ 900px)
+───────────────────────────────────────── */
 @media (max-width: 900px) {
   .addressGrid {
     grid-template-columns: 1fr;
+  }
+
+  .formCard {
+    padding: 28px;
+  }
+
+  .infoBox {
+    padding: 22px;
+  }
+}
+
+/* ─────────────────────────────────────────
+   RESPONSIVE — Tablette (≤ 768px)
+───────────────────────────────────────── */
+@media (max-width: 768px) {
+  .contactGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .formCard {
+    padding: 24px;
+  }
+
+  .infoBox {
+    padding: 20px;
+  }
+
+  .sectionTitle {
+    font-size: 18px;
+  }
+
+  .phoneText {
+    font-size: 16px;
+  }
+}
+
+/* ─────────────────────────────────────────
+   RESPONSIVE — Mobile (≤ 480px)
+───────────────────────────────────────── */
+@media (max-width: 480px) {
+  .contactGrid {
+    gap: 16px;
+    margin-top: 12px;
+  }
+
+  .formCard {
+    padding: 16px;
+  }
+
+  .infoBox {
+    padding: 16px;
+  }
+
+  .inputRow {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .inputGroup input,
+  .inputGroup select,
+  .inputGroup textarea {
+    padding: 10px;
+    font-size: 14px;
+  }
+
+  .discordBtn {
+    display: block;
+    text-align: center;
+    padding: 12px;
+  }
+
+  .sectionTitle {
+    font-size: 16px;
+    margin-bottom: 16px;
+  }
+
+  .separator {
+    margin: 20px 0;
+  }
+
+  .phoneText {
+    font-size: 15px;
+  }
+
+  .transportList {
+    font-size: 13px;
   }
 }

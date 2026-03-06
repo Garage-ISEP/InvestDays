@@ -16,7 +16,7 @@
   color: #000;
   font-size: 20px;
   margin-bottom: 15px;
-  border-left: 4px solid #f3ca3e; 
+  border-left: 4px solid #f3ca3e;
   padding-left: 15px;
 }
 
@@ -30,4 +30,50 @@
 
 .section li {
   margin-bottom: 8px;
+}
+
+/* ─────────────────────────────────────────
+   RESPONSIVE — Tablette (≤ 768px)
+───────────────────────────────────────── */
+@media (max-width: 768px) {
+  .legalContent {
+    padding: 28px;
+  }
+
+  .section h2 {
+    font-size: 18px;
+  }
+}
+
+/* ─────────────────────────────────────────
+   RESPONSIVE — Mobile (≤ 480px)
+───────────────────────────────────────── */
+@media (max-width: 480px) {
+  .legalContent {
+    padding: 16px;
+    border-radius: 8px;
+  }
+
+  .section {
+    margin-bottom: 20px;
+  }
+
+  .section h2 {
+    font-size: 16px;
+    padding-left: 10px;
+    margin-bottom: 10px;
+  }
+
+  .section ul {
+    padding-left: 14px;
+  }
+
+  .section li {
+    margin-bottom: 6px;
+    font-size: 14px;
+  }
+
+  .section p {
+    font-size: 14px;
+  }
 }

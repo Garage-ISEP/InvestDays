@@ -138,8 +138,74 @@
 .imageDessus {
   display: flex;
   justify-content: center;
-  margin-bottom: -100px; /* Une marge négative "tire" le bloc suivant vers le haut */
+  margin-bottom: -100px;
   position: relative;
-  bottom: 50px; /* Descend l'image de 60px */
+  bottom: 50px;
 }
 
+/* ─────────────────────────────────────────
+   RESPONSIVE — Mobile (≤ 480px)
+───────────────────────────────────────── */
+@media (max-width: 480px) {
+  .container {
+    padding: 20px 16px;
+    justify-content: flex-start;
+    padding-top: 40px;
+  }
+
+  .main {
+    width: 100%;
+    max-width: 350px;
+    height: 480px;
+  }
+
+  .login label,
+  .signin label {
+    font-size: 1.6em;
+    margin: 40px 20px;
+  }
+
+  .login input,
+  .signin input {
+    width: 75%;
+  }
+
+  .login .button,
+  .signin .button {
+    width: 75%;
+  }
+
+  .imageDessus {
+    margin-bottom: -80px;
+    bottom: 40px;
+  }
+
+  .imageDessus img {
+    max-width: 120px;
+  }
+}
+
+/* ─────────────────────────────────────────
+   RESPONSIVE — Très petit (≤ 360px)
+───────────────────────────────────────── */
+@media (max-width: 360px) {
+  .main {
+    height: 460px;
+  }
+
+  .login label,
+  .signin label {
+    font-size: 1.4em;
+    margin: 30px 16px;
+  }
+
+  .login input,
+  .signin input {
+    width: 82%;
+  }
+
+  .login .button,
+  .signin .button {
+    width: 82%;
+  }
+}

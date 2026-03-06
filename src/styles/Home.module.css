@@ -1,6 +1,6 @@
 .pageContainer {
   padding: 20px 8%;
-  background-color: #fdfbf1; /* Fond de l'image */
+  background-color: #fdfbf1;
   min-height: 100vh;
 }
 
@@ -9,11 +9,13 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 50px;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
 /* Onglets de navigation en haut */
 .navTabActive {
-  background: var(--premier); /* Jaune #f3ca3e */
+  background: var(--premier);
   border: none;
   padding: 8px 16px;
   border-radius: 8px;
@@ -30,7 +32,7 @@
 }
 
 .portfolioBadge {
-  background: #fffbe6; /* Jaune très clair */
+  background: #fffbe6;
   border: 1px solid #ffe58f;
   padding: 8px 16px;
   border-radius: 10px;
@@ -69,7 +71,7 @@
 }
 
 .performanceBadge {
-  background: #e6f9f1; /* Vert clair */
+  background: #e6f9f1;
   color: #2ecc71;
   padding: 4px 10px;
   border-radius: 6px;
@@ -92,7 +94,7 @@
 /* Bouton Buy Jaune */
 .buyButton {
   width: 100%;
-  background-color: var(--premier); /* Jaune f3ca3e */
+  background-color: var(--premier);
   border: none;
   padding: 12px;
   border-radius: 8px;
@@ -105,51 +107,52 @@
   display: flex;
   gap: 12px;
   margin-bottom: 40px;
-  flex-wrap: wrap; /* Pour que les boutons passent à la ligne sur mobile */
+  flex-wrap: wrap;
 }
 
 /* Style commun pour tous les boutons de filtres */
 .filterActive, .filterItem {
   padding: 10px 22px;
-  border-radius: 12px; /* Même arrondi que le bouton Buy */
-  font-weight: 700;    /* Texte gras pour l'aspect financier */
+  border-radius: 12px;
+  font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
   font-size: 14px;
 }
 
-/* Le bouton actif : Exactement comme le bouton Buy */
+/* Le bouton actif */
 .filterActive {
-  background-color: var(--premier); /* Jaune #f3ca3e */
+  background-color: var(--premier);
   color: #000;
   border: none;
   box-shadow: 0 4px 10px rgba(243, 202, 62, 0.2);
 }
 
-/* Les boutons inactifs : Fond blanc, bordure jaune */
+/* Les boutons inactifs */
 .filterItem {
   background-color: #ffffff;
   color: #1a1a1a;
-  border: 2px solid var(--premier); /* Rappel du jaune sur les contours */
+  border: 2px solid var(--premier);
 }
 
-/* Effet au survol pour les boutons inactifs */
 .filterItem:hover {
-  background-color: #fffbe6; /* Un jaune très léger au survol */
+  background-color: #fffbe6;
   transform: translateY(-2px);
 }
 
-
+/* Section Welcome */
 .welcomeSection {
-  background-color: var(--premier); 
+  background-color: var(--premier);
   padding: 30px;
   border-radius: 12px;
   margin-bottom: 30px;
   display: flex;
-  flex-direction: row; 
-  justify-content: space-between; 
-  align-items: center; 
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
   box-shadow: 0 4px 15px rgba(243, 202, 62, 0.15);
+  gap: 16px;
+  flex-wrap: wrap;
 }
 
 .welcomeText {
@@ -163,6 +166,7 @@
   align-items: center;
   gap: 10px;
   text-decoration: none;
+  flex-shrink: 0;
 }
 
 .poweredByText {
@@ -182,25 +186,17 @@
   box-shadow: 0 2px 6px rgba(0,0,0,0.05);
 }
 
-/* On remet la filterBar simple */
-.filterBar {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 40px;
-  flex-wrap: wrap;
-}
-
 .marketTitle {
   font-size: 28px;
-  font-weight: 800; /* Très gras comme le texte "Buy" */
-  color: #000;      /* Texte noir sur fond jaune pour le contraste */
+  font-weight: 800;
+  color: #000;
   margin: 0;
 }
 
 .marketSub {
   font-size: 16px;
   font-weight: 500;
-  color: #333;      /* Un gris très foncé pour rester lisible sur le jaune */
+  color: #333;
   margin: 0;
   opacity: 0.9;
 }
@@ -208,7 +204,7 @@
 /* Card Performance Personnelle */
 .performanceCard {
   background: white;
-  border: 1px solid #f3ca3e; /* Bordure jaune fine conforme au thème */
+  border: 1px solid #f3ca3e;
   border-radius: 12px;
   padding: 30px;
   box-shadow: 0 2px 10px rgba(0,0,0,0.02);
@@ -219,16 +215,18 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 25px;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
-.perfTitle { 
-  font-weight: 700; 
+.perfTitle {
+  font-weight: 700;
   font-size: 1.1rem;
-  color: #1a1a1a; 
+  color: #1a1a1a;
 }
 
 .rankBadge {
-  background: #fdf5d7; /* Fond jaune très clair */
+  background: #fdf5d7;
   color: #a38100;
   padding: 6px 16px;
   border-radius: 20px;
@@ -239,7 +237,8 @@
 
 .perfGrid {
   display: flex;
-  gap: 80px; /* Grand espacement entre les statistiques */
+  gap: 40px;
+  flex-wrap: wrap;
 }
 
 .perfItem label {
@@ -252,7 +251,7 @@
 }
 
 .perfValue {
-  font-size: 1.8rem; /* Valeurs numériques très lisibles */
+  font-size: 1.8rem;
   font-weight: 800;
   color: #1a1a1a;
 }
@@ -268,4 +267,141 @@
   align-items: center;
   font-size: 1.6rem;
   box-shadow: 0 4px 12px rgba(243, 202, 62, 0.3);
+  flex-shrink: 0;
+}
+
+/* ─────────────────────────────────────────
+   RESPONSIVE — Tablette (≤ 768px)
+───────────────────────────────────────── */
+@media (max-width: 768px) {
+  .pageContainer {
+    padding: 16px 4%;
+  }
+
+  .marketHeader {
+    margin-bottom: 30px;
+  }
+
+  .welcomeSection {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 20px;
+  }
+
+  .marketTitle {
+    font-size: 22px;
+  }
+
+  .marketSub {
+    font-size: 14px;
+  }
+
+  .assetsGrid {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 16px;
+  }
+
+  .perfGrid {
+    gap: 24px;
+  }
+
+  .perfValue {
+    font-size: 1.5rem;
+  }
+
+  .filterActive, .filterItem {
+    padding: 8px 16px;
+    font-size: 13px;
+  }
+
+  .performanceCard {
+    padding: 20px;
+  }
+}
+
+/* ─────────────────────────────────────────
+   RESPONSIVE — Mobile (≤ 480px)
+───────────────────────────────────────── */
+@media (max-width: 480px) {
+  .pageContainer {
+    padding: 12px 4%;
+  }
+
+  .marketHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 20px;
+  }
+
+  .navTabActive,
+  .navTab {
+    margin-right: 8px;
+    font-size: 13px;
+  }
+
+  .welcomeSection {
+    padding: 16px;
+    gap: 12px;
+  }
+
+  .marketTitle {
+    font-size: 18px;
+  }
+
+  .marketSub {
+    font-size: 13px;
+  }
+
+  .assetsGrid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .assetCard {
+    padding: 16px;
+  }
+
+  .price {
+    font-size: 22px;
+  }
+
+  .filterBar {
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+
+  .filterActive, .filterItem {
+    padding: 8px 14px;
+    font-size: 12px;
+    border-radius: 10px;
+  }
+
+  .perfGrid {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .perfValue {
+    font-size: 1.4rem;
+  }
+
+  .performanceCard {
+    padding: 16px;
+  }
+
+  .perfHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .rankIconBadge {
+    width: 44px;
+    height: 44px;
+    font-size: 1.3rem;
+  }
+
+  .portfolioBadge {
+    font-size: 13px;
+    padding: 6px 12px;
+  }
 }

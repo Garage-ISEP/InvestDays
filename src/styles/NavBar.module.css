@@ -5,13 +5,26 @@
   padding-inline: 20px;
   border-bottom: 1px solid var(--clrUnselected);
   display: flex;
-  justify-content: space-between; 
+  justify-content: space-between;
   align-items: center;
   background-color: #fdfbf1;
   position: relative;
 }
 
-/* --- SECTION GAUCHE : NAVIGATION --- */
+/* --- SECTION GAUCHE : LOGO + NAVIGATION --- */
+.leftSection {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.logoContainerLeft {
+  margin-right: 30px;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
 .navButtonContainer {
   display: flex;
   justify-content: flex-start;
@@ -19,7 +32,6 @@
   list-style: none;
   margin: 0;
   padding: 0;
-  flex: 1; /* Pousse le reste vers la droite */
 }
 
 .navButtonContainer li {
@@ -30,7 +42,7 @@
 .navButtonContainer li a {
   vertical-align: middle;
   display: flex;
-  margin-right: 35px; /* Espace entre les onglets */
+  margin-right: 35px;
   text-decoration: none;
   color: var(--clrUnselected);
   font-family: 'Inter', sans-serif;
@@ -98,13 +110,13 @@
   font-weight: bold;
 }
 
-/* --- SECTION DROITE : USER + LOGO + DECO --- */
+/* --- SECTION DROITE --- */
 .rightSection {
   display: flex;
   align-items: center;
   gap: 20px;
   justify-content: flex-end;
-  flex: 1; /* Équilibre avec la gauche pour garder le centre au milieu */
+  flex: 1;
 }
 
 .userInfoRight {
@@ -141,11 +153,40 @@
   display: flex;
   align-items: center;
   transition: transform 0.2s ease, opacity 0.2s ease;
+  flex-shrink: 0;
 }
 
 .logoutBtn:hover {
   transform: scale(1.1);
   opacity: 0.8;
+}
+
+/* --- BOUTON LANGUE --- */
+.langBtn {
+  background-color: #f3ca3e;
+  color: #1a1a1a;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  transition: all 0.2s ease;
+  margin-right: 15px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.langBtn:hover {
+  background-color: #e5bd35;
+  transform: scale(1.05);
+}
+
+.langBtn:active {
+  transform: scale(0.95);
 }
 
 /* --- MENU BURGER (MOBILE) --- */
@@ -161,25 +202,46 @@
   transition: 0.3s ease;
 }
 
-/* --- RESPONSIVE --- */
+.change .menuLine1 { transform: translateY(6px) rotate(-45deg); }
+.change .menuLine2 { opacity: 0; }
+.change .menuLine3 { transform: translateY(-6px) rotate(45deg); }
+
+/* ─────────────────────────────────────────
+   RESPONSIVE — ≤ 1050px
+───────────────────────────────────────── */
 @media only screen and (max-width: 1050px) {
-  /* On désactive le positionnement absolu du centre si l'écran rétrécit trop */
   .centerSection {
     position: static;
     transform: none;
-    margin: 0 auto;
+    margin: 0 10px;
   }
-  
+
   .navButtonContainer {
     flex: none;
   }
+
+  .navButtonContainer li a {
+    margin-right: 20px;
+    font-size: 13px;
+  }
+
+  .userEmail {
+    display: none; /* Masque l'email pour gagner de la place */
+  }
+
+  .langBtn {
+    margin-right: 8px;
+  }
 }
 
+/* ─────────────────────────────────────────
+   RESPONSIVE — ≤ 750px (menu burger)
+───────────────────────────────────────── */
 @media only screen and (max-width: 750px) {
   .navBarContainer {
     flex-direction: column;
     height: auto;
-    padding-inline: 0px;
+    padding-inline: 0;
     align-items: flex-start;
   }
 
@@ -188,6 +250,11 @@
     padding: 10px 20px;
     justify-content: space-between;
     border-bottom: 1px solid #eee;
+    box-sizing: border-box;
+  }
+
+  .centerSection {
+    display: none; /* Masqué sur mobile, accessible via le menu burger */
   }
 
   .navButtonContainer {
@@ -211,6 +278,7 @@
     width: 100%;
     padding: 15px 20px;
     margin-right: 0;
+    box-sizing: border-box;
   }
 
   .menu {
@@ -218,70 +286,39 @@
     position: absolute;
     right: 20px;
     top: 25px;
+    cursor: pointer;
   }
 
-  .change .menuLine1 { transform: translateY(6px) rotate(-45deg); }
-  .change .menuLine2 { opacity: 0; }
-  .change .menuLine3 { transform: translateY(-6px) rotate(45deg); }
+  .langBtn {
+    margin-right: 0;
+  }
+
+  .userEmail {
+    display: none;
+  }
+
+  .separator {
+    display: none;
+  }
 }
 
-.langBtn {
-  background-color: #f3ca3e; 
-  color: #1a1a1a;
-  border: none;
-  padding: 6px 14px;
-  border-radius: 20px;
-  cursor: pointer;
-  font-family: 'Inter', sans-serif;
-  font-size: 12px;
-  font-weight: 700; 
-  transition: all 0.2s ease;
-  margin-right: 15px;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
+/* ─────────────────────────────────────────
+   RESPONSIVE — ≤ 480px
+───────────────────────────────────────── */
+@media only screen and (max-width: 480px) {
+  .rightSection {
+    padding: 10px 14px;
+    gap: 10px;
+  }
 
-.langBtn:hover {
+  .portfolioBadge {
+    font-size: 12px;
+    padding: 5px 10px;
+    gap: 6px;
+  }
 
-  background-color: #e5bd35;
-  transform: scale(1.05);
-}
-
-.langBtn:active {
-  transform: scale(0.95);
-}
-
-/* --- SECTION GAUCHE : LOGO + NAVIGATION --- */
-.leftSection {
-  display: flex;
-  align-items: center;
-  flex: 1; /* Prend l'espace à gauche pour laisser le centre au milieu */
-}
-
-.logoContainerLeft {
-  margin-right: 30px; /* Espace entre le logo et le bouton Accueil */
-  display: flex;
-  align-items: center;
-}
-
-.navButtonContainer {
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  /* flex: 1;  <-- Supprimez ou commentez cette ligne pour éviter que les onglets ne s'étirent trop */
-}
-
-/* --- MISE À JOUR DU CONTAINER --- */
-.navBarContainer {
-  height: 75px;
-  padding-inline: 20px;
-  border-bottom: 1px solid var(--clrUnselected);
-  display: flex;
-  justify-content: space-between; 
-  align-items: center;
-  position: relative;
+  .langBtn {
+    padding: 5px 10px;
+    font-size: 11px;
+  }
 }

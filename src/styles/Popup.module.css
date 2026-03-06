@@ -4,30 +4,23 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.4); /* Un peu plus léger pour plus de modernité */
+  background-color: rgba(0, 0, 0, 0.4);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 100;
-  backdrop-filter: blur(2px); /* Effet de flou sur l'arrière-plan */
+  backdrop-filter: blur(2px);
 }
 
 .modal {
   background-color: white;
-  padding: 40px; /* Plus d'espace interne */
-  border-radius: 20px; /* Coins plus arrondis */
+  padding: 40px;
+  border-radius: 20px;
   box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.1);
   width: 90%;
   max-width: 450px;
   z-index: 101;
   position: relative;
-}
-
-@media (max-width: 500px) {
-  .modal {
-    width: 95%;
-    padding: 25px;
-  }
 }
 
 .modalContent {
@@ -38,7 +31,7 @@
 
 .modalTitle {
   font-size: 1.8rem;
-  font-weight: 600; /* Plus gras */
+  font-weight: 600;
   text-align: center;
   margin-bottom: 8px;
   color: #1a1a1a;
@@ -57,11 +50,11 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 0; /* On colle les éléments pour le style segmenté */
+  gap: 0;
 }
 
 .inputNumberWrapper button {
-  background-color: #f0f2f5; /* Fond gris très léger */
+  background-color: #f0f2f5;
   color: #333;
   font-size: 1.2rem;
   font-weight: bold;
@@ -80,11 +73,11 @@
 }
 
 .inputNumberWrapper button.decrease {
-  border-radius: 10px 0 0 10px; /* Arrondi à gauche */
+  border-radius: 10px 0 0 10px;
 }
 
 .inputNumberWrapper button.increase {
-  border-radius: 0 10px 10px 0; /* Arrondi à droite */
+  border-radius: 0 10px 10px 0;
 }
 
 .inputNumberWrapper input {
@@ -104,7 +97,7 @@
 
 /* --- BOUTON PRINCIPAL --- */
 .buttonBuy {
-  background-color: #f3ca3e; /* Ton jaune */
+  background-color: #f3ca3e;
   color: #1a1a1a;
   border: none;
   border-radius: 12px;
@@ -114,7 +107,7 @@
   cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s;
   margin-top: 20px;
-  width: 100%; /* Bouton pleine largeur pour plus d'impact */
+  width: 100%;
 }
 
 .buttonBuy:hover {
@@ -122,10 +115,10 @@
   box-shadow: 0 5px 15px rgba(243, 202, 62, 0.3);
 }
 
-/* --- BOUTON FERMER (MODERNISÉ) --- */
+/* --- BOUTON FERMER --- */
 .closeLink {
   background: none;
-  border: none;
+  border: 1px solid #eee;
   color: #999;
   font-size: 0.9rem;
   font-weight: 600;
@@ -133,7 +126,6 @@
   cursor: pointer;
   text-decoration: none;
   transition: color 0.2s;
-  border: 1px solid #eee; /* Petit cadre discret */
   padding: 5px 15px;
   border-radius: 5px;
 }
@@ -141,4 +133,70 @@
 .closeLink:hover {
   color: #333;
   background-color: #f9f9f9;
+}
+
+/* ─────────────────────────────────────────
+   RESPONSIVE — ≤ 500px
+───────────────────────────────────────── */
+@media (max-width: 500px) {
+  .modal {
+    width: 95%;
+    padding: 25px;
+    border-radius: 14px;
+  }
+
+  .modalTitle {
+    font-size: 1.5rem;
+  }
+
+  .modalSubtitle {
+    font-size: 0.9rem;
+    margin-bottom: 18px;
+  }
+
+  .inputNumberWrapper button {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+  }
+
+  .inputNumberWrapper input {
+    width: 80px;
+    height: 40px;
+    font-size: 1rem;
+  }
+
+  .buttonBuy {
+    padding: 12px 20px;
+    font-size: 1rem;
+  }
+}
+
+/* ─────────────────────────────────────────
+   RESPONSIVE — ≤ 360px
+───────────────────────────────────────── */
+@media (max-width: 360px) {
+  .modal {
+    padding: 18px;
+  }
+
+  .modalTitle {
+    font-size: 1.3rem;
+  }
+
+  .inputNumberWrapper button {
+    width: 36px;
+    height: 36px;
+  }
+
+  .inputNumberWrapper input {
+    width: 70px;
+    height: 36px;
+    font-size: 0.95rem;
+  }
+
+  .closeLink {
+    font-size: 0.8rem;
+    margin-top: 16px;
+  }
 }

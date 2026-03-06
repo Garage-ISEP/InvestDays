@@ -39,6 +39,56 @@
   color: white;
 }
 
+/* LE BOUTON JAUNE ET ARRONDI */
+.sellButton {
+  background-color: #f3ca3e;
+  color: #1a1a1a;
+  border: none;
+  padding: 8px 24px;
+  border-radius: 20px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.sellButton:hover {
+  background-color: #e2ba2d;
+  transform: translateY(-1px);
+}
+
+/* Lignes */
+.tr {
+  border-bottom: 1px solid #f0f0f0;
+  transition: all 0.2s ease;
+}
+
+.goldRow {
+  background-color: rgba(255, 215, 0, 0.05);
+  border: 2px solid #FFD700 !important;
+  border-radius: 8px;
+}
+
+.silverRow {
+  background-color: rgba(192, 192, 192, 0.05);
+  border-left: 4px solid #C0C0C0;
+}
+
+.bronzeRow {
+  background-color: rgba(205, 127, 50, 0.05);
+  border-left: 4px solid #CD7F32;
+}
+
+.tr:hover {
+  background-color: #fff9e6;
+  transform: scale(1.01);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+/* ─────────────────────────────────────────
+   RESPONSIVE — ≤ 750px (mode cartes)
+───────────────────────────────────────── */
 @media screen and (max-width: 750px) {
   .transactionTable {
     border: 0;
@@ -59,13 +109,21 @@
     border-bottom: 3px solid #ddd;
     display: block;
     margin-bottom: 0.625em;
+    border-radius: 8px;
+    overflow: hidden;
   }
+
+  /* Préserver les bordures colorées du top 3 en mode carte */
+  .goldRow   { border: 2px solid #FFD700 !important; }
+  .silverRow { border: 2px solid #C0C0C0 !important; border-left: 4px solid #C0C0C0 !important; }
+  .bronzeRow { border: 2px solid #CD7F32 !important; border-left: 4px solid #CD7F32 !important; }
 
   .transactionTable .td {
     border-bottom: 1px solid #ddd;
     display: block;
     font-size: 0.8em;
     text-align: right;
+    padding: 0.5em 0.625em;
   }
 
   .transactionTable .td::before {
@@ -78,52 +136,32 @@
   .transactionTable .td:last-child {
     border-bottom: 0;
   }
+
+  /* Bouton pleine largeur dans la carte */
+  .sellButton {
+    width: 100%;
+    text-align: center;
+    padding: 10px;
+    border-radius: 8px;
+  }
+
+  /* Désactiver le scale au hover sur mobile (peu adapté au touch) */
+  .tr:hover {
+    transform: none;
+    box-shadow: none;
+  }
 }
 
-/* LE BOUTON JAUNE ET ARRONDI */
-.sellButton {
-  background-color: #f3ca3e; /* Ton jaune */
-  color: #1a1a1a;
-  border: none;
-  padding: 8px 24px;
-  border-radius: 20px; /* Bords bien arrondis */
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 0.85rem;
-}
+/* ─────────────────────────────────────────
+   RESPONSIVE — ≤ 480px
+───────────────────────────────────────── */
+@media screen and (max-width: 480px) {
+  .transactionTable .td {
+    font-size: 0.75em;
+  }
 
-.sellButton:hover {
-  background-color: #e2ba2d;
-  transform: translateY(-1px);
-}
-
-/* Style de base pour toutes les lignes */
-.tr {
-  border-bottom: 1px solid #f0f0f0;
-  transition: all 0.2s ease;
-}
-
-/* Mise en avant du TOP 3 */
-.goldRow {
-  background-color: rgba(255, 215, 0, 0.05); /* Jaune très léger */
-  border: 2px solid #FFD700 !important;
-  border-radius: 8px;
-}
-
-.silverRow {
-  background-color: rgba(192, 192, 192, 0.05); /* Argent très léger */
-  border-left: 4px solid #C0C0C0;
-}
-
-.bronzeRow {
-  background-color: rgba(205, 127, 50, 0.05); /* Bronze très léger */
-  border-left: 4px solid #CD7F32;
-}
-
-/* Optionnel : effet au survol */
-.tr:hover {
-  background-color: #fff9e6;
-  transform: scale(1.01);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  .sellButton {
+    font-size: 0.8rem;
+    padding: 8px;
+  }
 }

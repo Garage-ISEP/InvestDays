@@ -13,7 +13,6 @@
 }
 
 .positionContainer table tr {
-  /* background-color: #f8f8f8; */
   border: 1px solid #ddd;
   padding: 0.35em;
 }
@@ -34,17 +33,35 @@
   display: none;
 }
 
-.name-ac{
+.name-ac {
   text-transform: uppercase;
 }
 
+/* ─────────────────────────────────────────
+   RESPONSIVE — ≤ 768px (tablette)
+───────────────────────────────────────── */
+@media screen and (max-width: 768px) {
+  .positionContainer table th,
+  .positionContainer table td {
+    padding: 0.45em;
+    font-size: 0.9em;
+  }
+
+  .positionContainer table caption {
+    font-size: 1.3em;
+  }
+}
+
+/* ─────────────────────────────────────────
+   RESPONSIVE — ≤ 600px (mobile : cartes)
+───────────────────────────────────────── */
 @media screen and (max-width: 600px) {
   .positionContainer table {
     border: 0;
   }
 
   .positionContainer table caption {
-    font-size: 1.3em;
+    font-size: 1.2em;
   }
 
   .positionContainer table thead {
@@ -69,6 +86,7 @@
     display: block;
     font-size: 0.8em;
     text-align: right;
+    padding: 0.5em 0.625em;
   }
 
   .positionContainer table td::before {
@@ -80,5 +98,18 @@
 
   .positionContainer table td:last-child {
     border-bottom: 0;
+  }
+}
+
+/* ─────────────────────────────────────────
+   RESPONSIVE — ≤ 360px
+───────────────────────────────────────── */
+@media screen and (max-width: 360px) {
+  .positionContainer table td {
+    font-size: 0.75em;
+  }
+
+  .positionContainer table caption {
+    font-size: 1.1em;
   }
 }

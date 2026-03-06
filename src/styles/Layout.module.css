@@ -14,3 +14,13 @@
   align-items: center;
   margin-bottom: 20px;
 }
+
+/* ─────────────────────────────────────────
+   RESPONSIVE — Mobile (≤ 480px)
+───────────────────────────────────────── */
+@media (max-width: 480px) {
+  .footer {
+    margin-bottom: 12px;
+    padding: 0 12px;
+  }
+}

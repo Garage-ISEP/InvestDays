@@ -173,7 +173,6 @@ docker-compose up --build
               </form>
             </div>
           </div>
-          <Partners />
         </div>
       </main>
     </>

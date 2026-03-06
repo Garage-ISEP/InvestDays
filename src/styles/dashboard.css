@@ -63,17 +63,6 @@
   scale: 0.97;
 }
 
-@media only screen and (max-width: 550px) {
-  .grid-container {
-    grid-template-columns: 1fr;
-    grid-template-rows: 1fr 1fr 2fr;
-    grid-template-areas:
-      "cash"
-      "portefeuille"
-      "actions";
-  }
-}
-
 .positionContainer {
   display: flex;
   flex-direction: row;
@@ -82,4 +71,67 @@
   align-items: center;
   padding-left: 5vw;
   padding-right: 5vw;
+}
+
+/* ─────────────────────────────────────────
+   RESPONSIVE — Tablette (≤ 768px)
+───────────────────────────────────────── */
+@media (max-width: 768px) {
+  .dashContainer h1 {
+    font-size: 36px;
+  }
+
+  .grid-container {
+    height: auto;
+    min-height: 100vh;
+  }
+
+  #cash > p,
+  #portefeuille > p {
+    font-size: 17px;
+  }
+
+  .positionContainer {
+    padding-left: 3vw;
+    padding-right: 3vw;
+    gap: 12px;
+  }
+}
+
+/* ─────────────────────────────────────────
+   RESPONSIVE — Mobile (≤ 550px)
+───────────────────────────────────────── */
+@media only screen and (max-width: 550px) {
+  .dashContainer {
+    margin-right: 12px;
+    margin-left: 12px;
+  }
+
+  .dashContainer h1 {
+    font-size: 26px;
+  }
+
+  .grid-container {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 1fr 2fr;
+    grid-template-areas:
+      "cash"
+      "portefeuille"
+      "actions";
+    height: auto;
+    min-height: 100vh;
+  }
+
+  #cash > p,
+  #portefeuille > p {
+    font-size: 15px;
+  }
+
+  .positionContainer {
+    flex-direction: column;
+    align-items: stretch;
+    padding-left: 4vw;
+    padding-right: 4vw;
+    gap: 10px;
+  }
 }

@@ -13,3 +13,39 @@
 .accueilContainer p {
   font-size: 25px;
 }
+
+/* ─────────────────────────────────────────
+   RESPONSIVE — Tablette (≤ 768px)
+───────────────────────────────────────── */
+@media (max-width: 768px) {
+  .accueilContainer {
+    margin-right: 16px;
+    margin-left: 16px;
+  }
+
+  .accueilContainer h1 {
+    font-size: 36px;
+  }
+
+  .accueilContainer p {
+    font-size: 18px;
+  }
+}
+
+/* ─────────────────────────────────────────
+   RESPONSIVE — Mobile (≤ 480px)
+───────────────────────────────────────── */
+@media (max-width: 480px) {
+  .accueilContainer {
+    margin-right: 12px;
+    margin-left: 12px;
+  }
+
+  .accueilContainer h1 {
+    font-size: 26px;
+  }
+
+  .accueilContainer p {
+    font-size: 15px;
+  }
+}

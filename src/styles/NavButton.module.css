@@ -1,25 +1,46 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 
+/* Règle dupliquée fusionnée + background-color: red supprimé */
 .list {
   list-style: none;
   display: flex;
-  background-color: red;
-}
-.list {
-  vertical-align: center;
-  display: flex;
+  align-items: center; /* vertical-align ne fonctionne pas sur flex, remplacé */
   margin-left: 40px;
-  list-style: none;
   text-decoration: none;
   color: var(--clrUnselected);
-  font-family: Inter;
+  font-family: 'Inter', sans-serif;
   font-weight: 600;
   font-size: 14px;
+  flex-wrap: wrap;
+  gap: 8px;
 }
+
 .active {
   color: var(--clrSelected);
   font-weight: 700;
 }
 
+/* ─────────────────────────────────────────
+   RESPONSIVE — ≤ 750px
+───────────────────────────────────────── */
+@media only screen and (max-width: 750px) {
+  .list {
+    margin-left: 20px;
+    font-size: 13px;
+    gap: 6px;
+  }
+}
+
+/* ─────────────────────────────────────────
+   RESPONSIVE — ≤ 500px
+───────────────────────────────────────── */
 @media only screen and (max-width: 500px) {
+  .list {
+    flex-direction: column;
+    margin-left: 0;
+    padding: 0 16px;
+    font-size: 14px;
+    gap: 0;
+    width: 100%;
+  }
 }

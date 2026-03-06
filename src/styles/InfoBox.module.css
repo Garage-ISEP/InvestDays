@@ -11,6 +11,7 @@
   border: 1px solid #dadada;
   border-radius: 10px;
 }
+
 .infoBoxIcon {
   background-color: #f4f4f4;
   padding: 10px;
@@ -20,7 +21,9 @@
   align-items: center;
   width: 20px;
   height: 20px;
+  flex-shrink: 0;
 }
+
 .infoBoxTitle,
 .infoBoxDesc {
   font-family: "Inter";
@@ -29,14 +32,44 @@
   font-size: 11px;
   color: #828282;
 }
+
 .infoBoxDesc {
   color: black;
   font-size: 18px;
   font-weight: 500;
 }
 
+/* ─────────────────────────────────────────
+   RESPONSIVE — Tablette (≤ 750px)
+───────────────────────────────────────── */
 @media screen and (max-width: 750px) {
   .infoBox {
     width: 200px;
+    height: auto;
+    padding: 14px 12px;
+  }
+
+  .infoBoxDesc {
+    font-size: 15px;
+  }
+}
+
+/* ─────────────────────────────────────────
+   RESPONSIVE — Mobile (≤ 480px)
+───────────────────────────────────────── */
+@media screen and (max-width: 480px) {
+  .infoBox {
+    width: 100%;
+    height: auto;
+    padding: 12px 10px;
+    gap: 10px;
+  }
+
+  .infoBoxDesc {
+    font-size: 14px;
+  }
+
+  .infoBoxTitle {
+    font-size: 10px;
   }
 }
