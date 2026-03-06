@@ -26,10 +26,10 @@ export default function Contact() {
     });
 
     if (response.ok) {
-      setStatus("✅ Message envoyé avec succès !");
+      setStatus("Message envoyé avec succès !");
       (e.target as HTMLFormElement).reset();
     } else {
-      setStatus("❌ Erreur lors de l'envoi. Réessayez.");
+      setStatus("Erreur lors de l'envoi. Réessayez.");
     }
   };
 
@@ -48,10 +48,8 @@ export default function Contact() {
         </div>
 
         <div className={contactStyles.contactGrid}>
-          {/* COLONNE GAUCHE : Formulaire + Adresses */}
           <div className={contactStyles.mainColumn}>
             
-            {/* Nouveau Bloc Formulaire */}
             <div className={contactStyles.formCard} style={{ marginBottom: '30px' }}>
               <h2 className={contactStyles.sectionTitle}>Envoyez-nous un message</h2>
               <form onSubmit={handleSubmit}>
@@ -85,7 +83,6 @@ export default function Contact() {
               </form>
             </div>
 
-            {/* Bloc Adresses */}
             <div className={contactStyles.formCard}>
               <h2 className={contactStyles.sectionTitle}>Nos Bureaux</h2>
               <div className={contactStyles.addressGrid}>
@@ -106,8 +103,7 @@ export default function Contact() {
               </div>
             </div>
           </div>
-
-          {/* COLONNE DROITE : Sidebar Support */}
+          
           <div className={contactStyles.infoSidebar}>
             <div className={contactStyles.infoBox}>
               <h3>Support Direct</h3>
