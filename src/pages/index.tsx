@@ -85,9 +85,6 @@ export default function Home() {
 
         <div className={homeStyles.filterBar}>
           <button className={homeStyles.filterActive}>{t.all}</button>
-          <button className={homeStyles.filterItem}>{t.tech}</button>
-          <button className={homeStyles.filterItem}>{t.auto}</button>
-          <button className={homeStyles.filterItem}>{t.fin}</button>
         </div>
 
         <div className={homeStyles.assetsGrid}>
