@@ -135,7 +135,7 @@ async function getRecentPrices(symbol: string, time: times = times.day, userId: 
 async function getDetailsStock(symbol: string, userId: number, ip: string): Promise<any> {
   return {
     results: {
-      name: symbol.toUpperCase(),
+      name: symbol.toUpperCase(), // ← c'est ça le problème, il retourne juste le symbole
       market_cap: null,
       weighted_shares_outstanding: null,
       branding: { logo_url: null },
