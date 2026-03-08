@@ -173,6 +173,17 @@ docker-compose up --build
               </form>
             </div>
           </div>
+
+          <div style={{ marginTop: "20px", textAlign: "center", width: "100%" }}>
+             <p style={{ fontSize: "0.8rem", color: "#666", marginBottom: "10px" }}>Powered by</p>
+             <a href="https://finage.co.uk" target="_blank" rel="noreferrer">
+                <img 
+                  src="/assets/partners/finage_logo.svg" 
+                  alt="Finage Logo" 
+                  style={{ width: "200px", height: "auto", opacity: "0.8" }}
+                />
+             </a>
+          </div>
         </div>
       </main>
     </>

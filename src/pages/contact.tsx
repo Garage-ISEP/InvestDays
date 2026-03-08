@@ -7,31 +7,6 @@ import DashBoardLayout from "../components/layouts/DashBoard.layout";
 export default function Contact() {
   const [status, setStatus] = useState("");
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setStatus("Envoi en cours...");
-    
-    const formData = new FormData(e.currentTarget);
-    const data = {
-      name: formData.get("name"),
-      email: formData.get("email"),
-      subject: formData.get("subject"),
-      message: formData.get("message"),
-    };
-
-    const response = await fetch("/api/contact", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    });
-
-    if (response.ok) {
-      setStatus("Message envoyé avec succès !");
-      (e.target as HTMLFormElement).reset();
-    } else {
-      setStatus("Erreur lors de l'envoi. Réessayez.");
-    }
-  };
 
   return (
     <>
@@ -49,39 +24,6 @@ export default function Contact() {
 
         <div className={contactStyles.contactGrid}>
           <div className={contactStyles.mainColumn}>
-            
-            <div className={contactStyles.formCard} style={{ marginBottom: '30px' }}>
-              <h2 className={contactStyles.sectionTitle}>Envoyez-nous un message</h2>
-              <form onSubmit={handleSubmit}>
-                <div className={contactStyles.inputGroup}>
-                  <label>Nom complet</label>
-                  <input name="name" type="text" required placeholder="Jean Dupont" />
-                </div>
-                <div className={contactStyles.inputGroup}>
-                  <label>Email ISEP</label>
-                  <input name="email" type="email" required placeholder="prenom.nom@eleve.isep.fr" />
-                </div>
-                <div className={contactStyles.inputRow}>
-                  <div className={contactStyles.inputGroup} style={{ flex: 1 }}>
-                    <label>Sujet</label>
-                    <select name="subject">
-                      <option>Problème technique</option>
-                      <option>Question sur les règles</option>
-                      <option>Partenariat / Twelve Data</option>
-                      <option>Autre</option>
-                    </select>
-                  </div>
-                </div>
-                <div className={contactStyles.inputGroup}>
-                  <label>Message</label>
-                  <textarea name="message" required rows={5} placeholder="Comment pouvons-nous vous aider ?"></textarea>
-                </div>
-                {status && <p className={contactStyles.statusMsg}>{status}</p>}
-                <button type="submit" className={homeStyles.buyButton}>
-                  Envoyer le message
-                </button>
-              </form>
-            </div>
 
             <div className={contactStyles.formCard}>
               <h2 className={contactStyles.sectionTitle}>Nos Bureaux</h2>
@@ -107,7 +49,6 @@ export default function Contact() {
           <div className={contactStyles.infoSidebar}>
             <div className={contactStyles.infoBox}>
               <h3>Support Direct</h3>
-              <p className={contactStyles.phoneText}>📞 06 00 00 00 00</p>
               <a href="mailto:investdays@garageisep.com" className={contactStyles.emailLink}>
                 investdays@garageisep.com
               </a>
@@ -116,7 +57,7 @@ export default function Contact() {
             <div className={contactStyles.infoBox}>
               <h3>Communauté</h3>
               <p>Rejoignez les traders sur Discord pour une aide instantanée.</p>
-              <a href="https://discord.gg/hstvfHKP" target="_blank" rel="noreferrer" className={contactStyles.discordBtn}>
+              <a href="https://discord.gg/FBKyc87pHh" target="_blank" rel="noreferrer" className={contactStyles.discordBtn}>
                 Ouvrir Discord
               </a>
             </div>

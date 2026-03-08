@@ -57,7 +57,7 @@ export default function Footer() {
           <div className={footerStyles.linkGroup}>
             <h4>{t.support}</h4>
             <a href="/contact">{t.contact}</a>
-            <a href="https://discord.gg/hstvfHKP" target="_blank" rel="noreferrer">
+            <a href="https://discord.gg/FBKyc87pHh" target="_blank" rel="noreferrer">
               {t.discord}
             </a>
           </div>

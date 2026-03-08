@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import { prisma } from "../../../lib/prisma";
 import { apiHandler } from "../../../helpers/api/api-handler";
 import type { NextApiRequest, NextApiResponse } from "next";
@@ -20,67 +21,119 @@ async function getAdminStats(req: AuthenticatedRequest, res: NextApiResponse) {
   }
 
   try {
-    const [userCount, transactionCount, walletStats, transactions, history, users] = await Promise.all([
+    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    const startDate = new Date("2024-01-01"); // Date de début du concours
+
+    const [
+      userCount, 
+      transactionCount, 
+      walletStats, 
+      recentTransactions, 
+      history, 
+      newWallets,
+      activeRatioGroup,
+      allTimeTransactions
+    ] = await Promise.all([
       prisma.user.count(),
       prisma.transaction.count(),
       prisma.wallet.aggregate({
         _sum: { cash: true },
         _avg: { cash: true }
       }),
+      // Pour les stats journalières (actifs et flux)
       prisma.transaction.findMany({
-        where: {
-          createdAt: { gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) },
-          status: "EXECUTED"
-        },
-        select: { createdAt: true },
+        where: { createdAt: { gte: thirtyDaysAgo }, status: "EXECUTED" },
+        select: { createdAt: true, walletId: true },
         orderBy: { createdAt: "asc" }
       }),
       prisma.history.findMany({
-        where: {
-          date: { gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) }
-        },
+        where: { date: { gte: thirtyDaysAgo } },
         select: { date: true, walletValue: true },
         orderBy: { date: "asc" }
       }),
-      // ← AJOUT : inscriptions des 30 derniers jours via le wallet (createdAt)
       prisma.wallet.findMany({
-        where: {
-          createdAt: { gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) }
-        },
+        where: { createdAt: { gte: thirtyDaysAgo } },
+        select: { createdAt: true },
+        orderBy: { createdAt: "asc" }
+      }),
+      // Ratio : au moins 5 tx sur 7 jours
+      prisma.transaction.groupBy({
+        by: [Prisma.TransactionScalarFieldEnum.walletId],
+        where: { createdAt: { gte: sevenDaysAgo }, status: "EXECUTED" },
+        _count: { id: true },
+        having: { id: { _count: { gte: 5 } } }
+      }),
+      // Pour la courbe de croissance cumulée
+      prisma.transaction.findMany({
+        where: { status: "EXECUTED", createdAt: { gte: startDate } },
         select: { createdAt: true },
         orderBy: { createdAt: "asc" }
       })
     ]);
 
+    // 1. CALCUL DES UTILISATEURS ACTIFS UNIQUES PAR JOUR (Logique Set)
+    const activeUsersByDay: Record<string, Set<number>> = {};
     const txByDay: Record<string, number> = {};
-    for (const tx of transactions) {
-      const day = tx.createdAt.toISOString().split("T")[0];
-      txByDay[day] = (txByDay[day] || 0) + 1;
-    }
-    const transactionsPerDay = Object.entries(txByDay).map(([date, count]) => ({ date, count }));
 
+    recentTransactions.forEach(tx => {
+      const day = tx.createdAt.toISOString().split("T")[0];
+      
+      // Compte unique par jour
+      if (!activeUsersByDay[day]) activeUsersByDay[day] = new Set();
+      activeUsersByDay[day].add(tx.walletId);
+
+      // Volume total de transactions par jour
+      txByDay[day] = (txByDay[day] || 0) + 1;
+    });
+
+    const activeUsersPerDay = Object.entries(activeUsersByDay)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([date, walletSet]) => ({ date, count: walletSet.size }));
+
+    const transactionsPerDay = Object.entries(txByDay)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([date, count]) => ({ date, count }));
+
+    // 2. MASSE MONÉTAIRE PAR JOUR
     const cashByDay: Record<string, number> = {};
-    for (const h of history) {
+    history.forEach(h => {
       const day = h.date.toISOString().split("T")[0];
       cashByDay[day] = (cashByDay[day] || 0) + h.walletValue;
-    }
+    });
     const cashPerDay = Object.entries(cashByDay).map(([date, total]) => ({ 
       date, 
       total: parseFloat(total.toFixed(2)) 
     }));
 
+    // 3. INSCRIPTIONS (30j)
     const registrationsByDay: Record<string, number> = {};
-    for (const w of users) {
+    newWallets.forEach(w => {
       const day = w.createdAt.toISOString().split("T")[0];
       registrationsByDay[day] = (registrationsByDay[day] || 0) + 1;
-    }
-    let cumulative = 0;
-    const registrationsPerDay = Object.entries(registrationsByDay)
+    });
+    const regData = Object.entries(registrationsByDay).map(([date, count]) => ({ date, count }));
+
+    // 4. CROISSANCE GLOBALE (CUMULÉE)
+    const globalGrowthData: { date: string; total: number }[] = [];
+    let runningTotal = 0;
+    const globalDailyCounts: Record<string, number> = {};
+
+    allTimeTransactions.forEach(tx => {
+      const day = tx.createdAt.toISOString().split("T")[0];
+      globalDailyCounts[day] = (globalDailyCounts[day] || 0) + 1;
+    });
+
+    Object.entries(globalDailyCounts)
       .sort(([a], [b]) => a.localeCompare(b))
-      .map(([date, count]) => {
-        cumulative += count;
-        return { date, count, total: cumulative };
+      .forEach(([date, count]) => {
+        runningTotal += count;
+        globalGrowthData.push({ date, total: runningTotal });
       });
+
+    // 5. RATIO ACTIFS/INACTIFS
+    const activeCount = activeRatioGroup.length;
+    const inactiveCount = Math.max(0, userCount - activeCount);
 
     res.status(200).json({
       status: "success",
@@ -91,14 +144,17 @@ async function getAdminStats(req: AuthenticatedRequest, res: NextApiResponse) {
         averageCash: walletStats._avg.cash || 0,
         transactionsPerDay,
         cashPerDay,
-        registrationsPerDay 
+        registrationsPerDay: regData,
+        activeUsersPerDay, // <-- Nouveau champ
+        cumulativeTransactions: globalGrowthData,
+        activeRatio: [
+          { name: "Actifs", value: activeCount },
+          { name: "Inactifs", value: inactiveCount }
+        ]
       }
     });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ 
-      status: "error", 
-      message: "Erreur lors du calcul des stats" 
-    });
+    console.error("Stats Error:", error);
+    res.status(500).json({ status: "error", message: "Erreur serveur stats" });
   }
 }
