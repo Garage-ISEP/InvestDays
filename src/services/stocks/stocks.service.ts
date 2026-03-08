@@ -9,26 +9,49 @@ export enum times {
 }
 
 async function search(term: string, userId: number, ip: string): Promise<StockApi[]> {
-  const url = `https://api.finage.co.uk/search/ticker/${term}?apikey=${FINAGE_API_KEY}`;
-  
   try {
-    const response = await fetch(url);
-    const data = await response.json();
+    // Lancer les 3 recherches en parallèle
+    const [stockRes, cryptoRes, forexRes] = await Promise.allSettled([
+      fetch(`https://api.finage.co.uk/fnd/search/market/us/${encodeURIComponent(term)}?limit=10&apikey=${FINAGE_API_KEY}`),
+      fetch(`https://api.finage.co.uk/fnd/search/cryptocurrency/${encodeURIComponent(term)}?limit=5&apikey=${FINAGE_API_KEY}`),
+      fetch(`https://api.finage.co.uk/fnd/search/currency/${encodeURIComponent(term)}?limit=5&apikey=${FINAGE_API_KEY}`),
+    ]);
+
     const matches: StockApi[] = [];
 
-    if (Array.isArray(data)) {
-      data.forEach((stock: any) => {
-        matches.push({
-          symbol: stock.symbol,
-          name: stock.name,
-          market: stock.market || "stocks",
-          region: "US",
-          currency: "USD",
+    // Stocks
+    if (stockRes.status === "fulfilled") {
+      const data = await stockRes.value.json();
+      if (data?.results && Array.isArray(data.results)) {
+        data.results.forEach((stock: any) => {
+          matches.push({ symbol: stock.symbol, name: stock.description, market: "stocks", region: "US", currency: "USD" });
         });
-      });
+      }
     }
+
+    // Crypto
+    if (cryptoRes.status === "fulfilled") {
+      const data = await cryptoRes.value.json();
+      if (data?.results && Array.isArray(data.results)) {
+        data.results.forEach((coin: any) => {
+          matches.push({ symbol: coin.symbol, name: coin.name, market: "crypto", region: "Global", currency: "USD" });
+        });
+      }
+    }
+
+    // Forex
+    if (forexRes.status === "fulfilled") {
+      const data = await forexRes.value.json();
+      if (data?.results && Array.isArray(data.results)) {
+        data.results.forEach((fx: any) => {
+          matches.push({ symbol: fx.symbol, name: `${fx.from} / ${fx.to}`, market: "forex", region: "Global", currency: fx.symbol?.slice(-3) || "USD" });
+        });
+      }
+    }
+
     return matches;
   } catch (error) {
+    console.error("Search error:", error);
     return [];
   }
 }
@@ -112,7 +135,7 @@ async function getRecentPrices(symbol: string, time: times = times.day, userId: 
 async function getDetailsStock(symbol: string, userId: number, ip: string): Promise<any> {
   return {
     results: {
-      name: symbol.toUpperCase(),
+      name: symbol.toUpperCase(), // ← c'est ça le problème, il retourne juste le symbole
       market_cap: null,
       weighted_shares_outstanding: null,
       branding: { logo_url: null },

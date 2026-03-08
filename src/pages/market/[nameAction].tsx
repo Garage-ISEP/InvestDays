@@ -24,8 +24,9 @@ export default function DetailAction(req: Request) {
   const { wallets, selectedId, getPrice } = useWallet();
   const { lang } = useLanguage();
   const router = useRouter();
-  const { nameAction } = router.query;
+  const { nameAction , name} = router.query;
   const fetch = useFetch();
+  
 
   const [dataCleaned, setDataCleaned] = useState({
     name: "-",
@@ -123,15 +124,15 @@ export default function DetailAction(req: Request) {
     }
   }, [nameAction, isAuthenticated, user]);
 
-  useEffect(() => {
-    if (detail) {
-      setDataCleaned({
-        name: detail.name || (nameAction as string) || "-",
-        market_cap: detail.market_cap || "-",
-        number: detail.weighted_shares_outstanding || "-",
-      });
-    }
-  }, [detail, nameAction]);
+useEffect(() => {
+  if (detail) {
+    setDataCleaned({
+      name: (name as string) || detail.name || (nameAction as string) || "-",
+      market_cap: detail.market_cap || "-",
+      number: detail.weighted_shares_outstanding || "-",
+    });
+  }
+}, [detail, nameAction, name]);
 
 const options = {
     chart: { 
@@ -183,12 +184,10 @@ const options = {
       buttons: lang === "fr" ? [
         { type: 'month', count: 1, text: '1m' },
         { type: 'month', count: 3, text: '3m' },
-        { type: 'year', count: 1, text: '1an' },
         { type: 'all', text: 'Tout' }
       ] : [
         { type: 'month', count: 1, text: '1m' },
         { type: 'month', count: 3, text: '3m' },
-        { type: 'year', count: 1, text: '1y' },
         { type: 'all', text: 'All' }
       ]
     },
@@ -217,15 +216,16 @@ const options = {
       <Head>
         <title>InvestDays - {nameAction}</title>
       </Head>
+      
 
       <main className={homeStyles.pageContainer}>
         <div className={homeStyles.marketHeader}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
              <div>
-                <h1 className={homeStyles.marketTitle}>{dataCleaned.name}</h1>
-                <p className={homeStyles.marketSub}>
-                  {nameAction} • {detail?.price ? `${detail.price.toFixed(2)}$` : "- $"}
-                </p>
+                  <h1 className={homeStyles.marketTitle}>{nameAction as string}</h1>
+                  <p className={homeStyles.marketSub}>
+                    {dataCleaned.name} • {detail?.price ? `${detail.price.toFixed(2)}$` : "- $"}
+                  </p>
              </div>
           </div>
 
