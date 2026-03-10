@@ -50,7 +50,7 @@ export default function Confidentialite() {
             <p>
               Les données sont stockées de manière sécurisée dans notre base de données PostgreSQL. 
               Elles sont conservées uniquement pour la durée de la compétition et sont supprimées à l'issue de l'année universitaire. 
-              Nous ne vendons ni ne partageons vos données avec des tiers, y compris Twelve Data (seuls les flux financiers transitent vers Twelve Data).
+              Nous ne vendons ni ne partageons vos données avec des tiers, y compris Finage (seuls les flux financiers transitent vers Finage).
             </p>
           </section>
 

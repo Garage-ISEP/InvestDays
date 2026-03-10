@@ -38,8 +38,8 @@ export default function MentionsLegales() {
           <section className={legalStyles.section}>
             <h2>2. Partenariats et Données Financières</h2>
             <p>
-              InvestDays utilise la technologie de <strong>Twelve Data</strong> pour accéder aux données financières mondiales. 
-              Twelve Data est un fournisseur leader de données financières précises en temps réel (actions, forex, crypto, etc.). 
+              InvestDays utilise la technologie de <strong>Finage</strong> pour accéder aux données financières mondiales. 
+              Finage est un fournisseur leader de données financières précises en temps réel (actions, forex, crypto, etc.). 
               Les données sont fournies à titre indicatif dans un but pédagogique et ne constituent pas des conseils en investissement.
             </p>
           </section>
