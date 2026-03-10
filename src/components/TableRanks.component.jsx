@@ -62,8 +62,11 @@ function TableRanks({ data = [], selectedId, lang }) {
                 {rank <= 3 ? medals[index] : `#${rank}`}
               </td>
               <td className={styles.td}>
-                <div style={{ fontWeight: '600' }}>{item.user?.name || item.user?.email?.split('@')[0]}</div>
-                <div style={{ fontSize: '0.75rem', color: '#888' }}>{item.user?.email}</div>
+                <div style={{ fontWeight: '600' }}>
+                  {item.user?.name || `Joueur ${item.user?.studentId || ''}`}
+                </div>
+                <div style={{ fontSize: '0.75rem', color: '#888' }}>
+                </div>
               </td>
               <td className={styles.td} style={{ fontWeight: '800', color: '#2ecc71' }}>
                 {cashVal.toLocaleString(undefined, { minimumFractionDigits: 2 })} $

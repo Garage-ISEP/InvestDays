@@ -38,14 +38,18 @@ export default function Login() {
 
   async function handleRegister(e: { preventDefault: () => void }) {
     e.preventDefault();
+    
     if (emailR === "" || passwordR === "" || name === "")
       return setError("Veuillez remplir tous les champs");
 
-    // check is email is valid
+    const isepIdRegex = /^\d{5}$/;
+    if (!isepIdRegex.test(name)) {
+      return setError("L'identifiant ISEP doit être composé de 5 chiffres");
+    }
+
     if (!emailR.includes("@eleve.isep.fr") && !emailR.includes("@isep.fr"))
       return setError("Merci d'utiliser votre mail ISEP");
 
-    // check if password is valid
     if (passwordR.length < 8)
       return setError("Le mot de passe doit contenir au moins 8 caractères");
 
@@ -57,14 +61,6 @@ export default function Login() {
     setError("");
   }
 
-  // useEffect(() => {
-  //   toast.info(
-  //     "N'hésitez pas à venir le 18 mars à l'InvestDay !"
-  //   );
-  //   toast.info(
-  //     "Remise des récompenses des premiers et spéciaux à l'InvestDay !"
-  //   );
-  // }, []);
 
   return (
     <>
