@@ -151,7 +151,7 @@ docker-compose up --build
                   type="password"
                   name="password"
                   id="password"
-                  placeholder="Mot de passe"
+                  placeholder="Mot de passe (min. 8 caractères)"
                 />
                 <button
                   type="submit"

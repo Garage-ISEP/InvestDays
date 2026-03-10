@@ -46,16 +46,24 @@ function AuthProvider({ children }) {
     }
   }
 
-  async function register(fetch, email, password, name) {
-    let result = await fetch.post("/api/auth/register", {
-      email,
-      password,
-      name,
-    });
-    if (result?.status) {
-      login(fetch, email, password);
+  async function register(fetch, email, password, name, callback) {
+    try {
+      let result = await fetch.post("/api/auth/register", {
+        email,
+        password,
+        studentId: name, 
+        name: name 
+      });
+
+      if (result?.status === "success") {
+        await login(fetch, email, password, callback);
+      }
+      return result;
+    } catch (e) {
+      const errorMsg = e.response?.data?.message || e.message || e;
+      
+      if (callback) callback(errorMsg);
     }
-    return result;
   }
 
   async function logout() {
