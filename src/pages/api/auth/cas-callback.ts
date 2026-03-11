@@ -12,11 +12,12 @@ export default async function casCallback(req: NextApiRequest, res: NextApiRespo
 
   const host = req.headers.host;
   const protocol = host?.includes("localhost") ? "http" : "https";
-  const baseUrl = `${protocol}://${host}`;
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || `${protocol}://${host}`;
   
   const serviceUrl = `${baseUrl}/api/auth/cas-callback`;
 
-  const casValidateUrlBase = "https://portail-ovh.isep.fr/cas/serviceValidate";
+  const casValidateUrlBase = process.env.CAS_VALIDATE_URL;
+  
   const casValidateUrl = `${casValidateUrlBase}?service=${encodeURIComponent(serviceUrl)}&ticket=${ticket}`;
 
   try {
@@ -65,7 +66,6 @@ export default async function casCallback(req: NextApiRequest, res: NextApiRespo
           }
         }
       });
-      console.log(`[CAS] Nouvel utilisateur créé: ${email}`);
     }
 
     const token = jwt.sign(

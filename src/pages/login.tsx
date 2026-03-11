@@ -35,13 +35,13 @@ const handleLoginISEP = () => {
     const baseUrl = window.location.origin; 
     const serviceUrl = `${baseUrl}/api/auth/cas-callback`;
     
-    const casLoginBase = "https://portail-ovh.isep.fr/cas/login";
+    const casLoginBase = process.env.NEXT_PUBLIC_CAS_LOGIN_URL;
  
     const finalUrl = `${casLoginBase}?service=${encodeURIComponent(serviceUrl)}`;
     
     console.log("Redirection vers :", finalUrl);
     window.location.href = finalUrl;
-  };
+};
 
   return (
     <>
