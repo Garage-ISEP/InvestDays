@@ -10,11 +10,15 @@ export default async function casCallback(req: NextApiRequest, res: NextApiRespo
     return res.redirect("/login?error=Ticket_manquant");
   }
 
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+  const host = req.headers.host;
+  const protocol = host?.includes("localhost") ? "http" : "https";
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || `${protocol}://${host}`;
+  
   const serviceUrl = `${baseUrl}/api/auth/cas-callback`;
-  const casBaseUrl = process.env.CAS_VALIDATE_URL;
 
-  const casValidateUrl = `${casBaseUrl}?service=${encodeURIComponent(serviceUrl)}&ticket=${ticket}`;
+  const casValidateUrlBase = process.env.CAS_VALIDATE_URL;
+  
+  const casValidateUrl = `${casValidateUrlBase}?service=${encodeURIComponent(serviceUrl)}&ticket=${ticket}`;
 
   try {
     const response = await fetch(casValidateUrl);
@@ -62,7 +66,6 @@ export default async function casCallback(req: NextApiRequest, res: NextApiRespo
           }
         }
       });
-      console.log(`[CAS] Nouvel utilisateur créé: ${email}`);
     }
 
     const token = jwt.sign(

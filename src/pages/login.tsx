@@ -29,15 +29,19 @@ export default function Login() {
     if (isAuthenticated) router.push("/");
   }, [isAuthenticated]);
 
-  const handleLoginISEP = () => {
-    const baseUrl = window.location.origin;
+const handleLoginISEP = () => {
+    setLoading(true);
+    
+    const baseUrl = window.location.origin; 
     const serviceUrl = `${baseUrl}/api/auth/cas-callback`;
     
-    // Utilise l'URL du .env
     const casLoginBase = process.env.NEXT_PUBLIC_CAS_LOGIN_URL;
+ 
+    const finalUrl = `${casLoginBase}?service=${encodeURIComponent(serviceUrl)}`;
     
-    window.location.href = `${casLoginBase}?service=${encodeURIComponent(serviceUrl)}`;
-  };
+    console.log("Redirection vers :", finalUrl);
+    window.location.href = finalUrl;
+};
 
   return (
     <>
