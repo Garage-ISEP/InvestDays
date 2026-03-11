@@ -77,7 +77,7 @@ async function register(req: NextApiRequest, res: NextApiResponse<any>) {
 
   console.log(`[REGISTER] Utilisateur créé (ID: ${result.newUser.id}). Token généré.`);
 
-  const baseUrl = "https://investdays.garageisep.com";
+  const baseUrl = "";
   const verificationLink = `${baseUrl}/api/auth/verify?token=${verificationToken}`;
 
   try {
