@@ -1,34 +1,30 @@
 import React from "react";
 import styles from "../styles/TableTransaction.module.css";
 
-// Ajout de 'lang' dans les props pour la synchronisation globale
+const STARTING_CASH = 10000;
+
 function TableRanks({ data = [], selectedId, lang }) {
-  
-  // Objet de traduction pour le classement
+
   const translations = {
     fr: {
       rank: "CLASSEMENT",
       investor: "INVESTISSEUR",
-      cash: "ARGENT DISPONIBLE",
-      id: "PORTEFEUILLE ID",
+      profit: "PROFIT/PERTE",
       loading: "Chargement des traders..."
     },
     en: {
       rank: "RANKING",
       investor: "INVESTOR",
-      cash: "AVAILABLE CASH",
-      id: "PORTFOLIO ID",
+      profit: "PROFIT/LOSS",
       loading: "Loading traders..."
     }
   };
 
-  // Sélection de la langue avec sécurité pour le typage
   const t = translations[lang] || translations.fr;
 
-  // TRI SUR LE CASH UNIQUEMENT
   const rankedData = [...data]
     .filter((item) => item?.user?.isAdmin === false)
-    .sort((a, b) => (Number(b.cash) || 0) - (Number(a.cash) || 0));
+    .sort((a, b) => (Number(b.publicWalletValue) || 0) - (Number(a.publicWalletValue) || 0));
 
   if (!rankedData.length) {
     return <p style={{ textAlign: 'center', padding: '20px', color: '#888' }}>{t.loading}</p>;
@@ -40,17 +36,17 @@ function TableRanks({ data = [], selectedId, lang }) {
         <tr className={styles.tr}>
           <th className={styles.th}>{t.rank}</th>
           <th className={styles.th}>{t.investor}</th>
-          <th className={styles.th}>{t.cash}</th>
-          <th className={styles.th}>{t.id}</th>
+          <th className={styles.th}>{t.profit}</th>
         </tr>
       </thead>
       <tbody>
         {rankedData.map((item, index) => {
           const rank = index + 1;
           const medals = ["🥇", "🥈", "🥉"];
-          const cashVal = Number(item.cash) || 0;
+          const totalValue = Number(item.publicWalletValue) || 0;
+          const profit = totalValue - STARTING_CASH;
           const isSelected = item.id === selectedId;
-          
+
           let podiumClass = "";
           if (rank === 1) podiumClass = styles.goldRow;
           else if (rank === 2) podiumClass = styles.silverRow;
@@ -65,14 +61,9 @@ function TableRanks({ data = [], selectedId, lang }) {
                 <div style={{ fontWeight: '600' }}>
                   {item.user?.name || `Joueur ${item.user?.studentId || ''}`}
                 </div>
-                <div style={{ fontSize: '0.75rem', color: '#888' }}>
-                </div>
               </td>
-              <td className={styles.td} style={{ fontWeight: '800', color: '#2ecc71' }}>
-                {cashVal.toLocaleString(undefined, { minimumFractionDigits: 2 })} $
-              </td>
-              <td className={styles.td} style={{ color: '#888', fontSize: '0.85rem' }}>
-                ID: {item.id}
+              <td className={styles.td} style={{ fontWeight: '800', color: profit >= 0 ? '#2ecc71' : '#e74c3c' }}>
+                {profit >= 0 ? "+" : ""}{profit.toLocaleString(undefined, { minimumFractionDigits: 2 })} $
               </td>
             </tr>
           );

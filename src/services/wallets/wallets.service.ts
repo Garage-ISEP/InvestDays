@@ -3,11 +3,11 @@ import { Wallet, User, Transaction, History } from "@prisma/client";
 import { prisma } from "../../lib/prisma";
 
 async function create(userId: number, balance: number): Promise<Wallet> {
-  // let prisma = new PrismaClient();
   return await prisma.wallet.create({
     data: {
       userId: userId,
       cash: balance,
+      publicWalletValue: balance, 
     },
   });
 }

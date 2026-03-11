@@ -20,6 +20,8 @@ model User {
   studentId String?  @unique
   isAdmin   Boolean  @default(false)
   wallet    Wallet[]
+  emailVerified   Boolean   @default(false)
+  verificationToken String? @unique
 }
 
 model Wallet {
@@ -29,7 +31,7 @@ model Wallet {
   userId            Int
   transactions      Transaction[]
   cash              Float         @default(0)
-  publicWalletValue Float         @default(0)
+  publicWalletValue Float         @default(10000)
   datePublicUpdated DateTime      @default(now())
   lastUpdatedValue  Float         @default(0)
   dateLastUpdated   DateTime      @default(now())
