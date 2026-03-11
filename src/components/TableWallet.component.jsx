@@ -3,14 +3,14 @@ import TableTransactionStyles from "../styles/TableTransaction.module.css";
 import { useWallet } from "../context/WalletContext";
 import Popup from "./Popup.component";
 
-// Ajout de la prop 'lang' pour la synchronisation globale
 function TableWallet({ selectedId, activeWalletTransactions, lang }) {
   const [symbol, setSymbol] = useState("");
   const [maxCount, setMaxCount] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
+  const [sortKey, setSortKey] = useState(null);
+  const [sortDir, setSortDir] = useState("asc");
   const { walletsLines, actualiseWalletsLines, valuesCached } = useWallet();
 
-  // Traductions des éléments du tableau
   const translations = {
     fr: {
       h_symbol: "Libellé",
@@ -40,90 +40,149 @@ function TableWallet({ selectedId, activeWalletTransactions, lang }) {
     }
   };
 
-  // Sélection sécurisée de la langue
   const t = translations[lang] || translations.fr;
 
   useEffect(() => {
     if (!(walletsLines && walletsLines[selectedId])) actualiseWalletsLines();
   }, [activeWalletTransactions]);
 
+  // Calcul des données enrichies pour le tri
+  const enrichedLines = (walletsLines?.[selectedId] || []).map((item) => {
+    const value = valuesCached?.[item.symbol]?.value;
+    if (value == null) return null;
+
+    let quantityBuy = 0;
+    let averagePriceAtExecution = item.valueAtExecution.reduce(
+      (acc, item2) => {
+        quantityBuy += item2.quantity;
+        return acc + item2.quantity * item2.price;
+      }, 0
+    );
+    averagePriceAtExecution = averagePriceAtExecution / quantityBuy;
+
+    const variation = value - averagePriceAtExecution;
+    const variationPercent = averagePriceAtExecution
+      ? (variation / averagePriceAtExecution) * 100
+      : 0;
+    const gain = variation * item.quantity;
+
+    return {
+      ...item,
+      value,
+      averagePriceAtExecution,
+      variation,
+      variationPercent,
+      gain,
+    };
+  }).filter(Boolean);
+
+  // Tri
+  const sortedLines = [...enrichedLines].sort((a, b) => {
+    if (!sortKey) return 0;
+    let valA = a[sortKey];
+    let valB = b[sortKey];
+    if (typeof valA === "string") valA = valA.toLowerCase();
+    if (typeof valB === "string") valB = valB.toLowerCase();
+    if (valA < valB) return sortDir === "asc" ? -1 : 1;
+    if (valA > valB) return sortDir === "asc" ? 1 : -1;
+    return 0;
+  });
+
+  function handleSort(key) {
+    if (sortKey === key) {
+      setSortDir(sortDir === "asc" ? "desc" : "asc");
+    } else {
+      setSortKey(key);
+      setSortDir("asc");
+    }
+  }
+
+  function SortIcon({ colKey }) {
+    if (sortKey !== colKey) return <span style={{ opacity: 0.3, marginLeft: '4px' }}>↕</span>;
+    return <span style={{ marginLeft: '4px' }}>{sortDir === "asc" ? "↑" : "↓"}</span>;
+  }
+
+  const thStyle = {
+    cursor: "pointer",
+    userSelect: "none",
+    whiteSpace: "nowrap",
+  };
+
   return (
     <>
       <table className={TableTransactionStyles.transactionTable}>
         <thead>
           <tr className={TableTransactionStyles.tr}>
-            <th className={TableTransactionStyles.th}>{t.h_symbol}</th>
-            <th className={TableTransactionStyles.th}>{t.h_quantity}</th>
-            <th className={TableTransactionStyles.th}>{t.h_buy}</th>
-            <th className={TableTransactionStyles.th}>{t.h_current}</th>
-            <th className={TableTransactionStyles.th}>{t.h_var_dollar}</th>
-            <th className={TableTransactionStyles.th}>{t.h_var_percent}</th>
-            <th className={TableTransactionStyles.th}>{t.h_gain}</th>
-            <th className={TableTransactionStyles.th}>{t.h_action}</th>
+            <th className={TableTransactionStyles.th} style={thStyle} onClick={() => handleSort("symbol")}>
+              {t.h_symbol}<SortIcon colKey="symbol" />
+            </th>
+            <th className={TableTransactionStyles.th} style={thStyle} onClick={() => handleSort("quantity")}>
+              {t.h_quantity}<SortIcon colKey="quantity" />
+            </th>
+            <th className={TableTransactionStyles.th} style={thStyle} onClick={() => handleSort("averagePriceAtExecution")}>
+              {t.h_buy}<SortIcon colKey="averagePriceAtExecution" />
+            </th>
+            <th className={TableTransactionStyles.th} style={thStyle} onClick={() => handleSort("value")}>
+              {t.h_current}<SortIcon colKey="value" />
+            </th>
+            <th className={TableTransactionStyles.th} style={thStyle} onClick={() => handleSort("variation")}>
+              {t.h_var_dollar}<SortIcon colKey="variation" />
+            </th>
+            <th className={TableTransactionStyles.th} style={thStyle} onClick={() => handleSort("variationPercent")}>
+              {t.h_var_percent}<SortIcon colKey="variationPercent" />
+            </th>
+            <th className={TableTransactionStyles.th} style={thStyle} onClick={() => handleSort("gain")}>
+              {t.h_gain}<SortIcon colKey="gain" />
+            </th>
+            <th className={TableTransactionStyles.th}>
+              {t.h_action}
+            </th>
           </tr>
         </thead>
         <tbody>
-          {walletsLines &&
-            walletsLines[selectedId] &&
-            walletsLines[selectedId].map((item, index) => {
-              let value = valuesCached?.[item.symbol]?.value;
-              if (value == null) return null;
-
-              let quantityBuy = 0;
-              let averagePriceAtExecution = item.valueAtExecution.reduce(
-                (acc, item2) => {
-                  quantityBuy += item2.quantity;
-                  return acc + item2.quantity * item2.price;
-                },
-                0
-              );
-              averagePriceAtExecution = averagePriceAtExecution / quantityBuy;
-
-              const variation = value - averagePriceAtExecution;
-              const isPositive = variation >= 0;
-
-              return (
-                <tr key={index} className={TableTransactionStyles.tr}>
-                  <td data-label={t.h_symbol} className={TableTransactionStyles.td} style={{fontWeight: 'bold'}}>
-                    {item?.symbol}
-                  </td>
-                  <td data-label={t.h_quantity} className={TableTransactionStyles.td}>
-                    {item?.quantity?.toFixed(2)}
-                  </td>
-                  <td data-label={t.h_buy} className={TableTransactionStyles.td}>
-                    {averagePriceAtExecution?.toFixed(2)} $
-                  </td>
-                  <td data-label={t.h_current} className={TableTransactionStyles.td}>
-                    {value?.toFixed(2)} $
-                  </td>
-                  <td data-label={t.h_var_dollar} className={TableTransactionStyles.td} style={{ color: isPositive ? '#2ecc71' : '#e74c3c' }}>
-                    {isPositive ? '+' : ''}{variation.toFixed(2)} $
-                  </td>
-                  <td data-label={t.h_var_percent} className={TableTransactionStyles.td} style={{ color: isPositive ? '#2ecc71' : '#e74c3c' }}>
-                    {averagePriceAtExecution ? (variation / averagePriceAtExecution * 100).toFixed(2) : "0.00"} %
-                  </td>
-                  <td data-label={t.h_gain} className={TableTransactionStyles.td} style={{fontWeight: 'bold'}}>
-                    {(variation * item.quantity).toFixed(2)} $
-                  </td>
-                  <td data-label={t.h_action} className={TableTransactionStyles.td}>
-                    <button 
-                      className={TableTransactionStyles.sellButton}
-                      onClick={() => { 
-                        setIsOpen(true); 
-                        setSymbol(item.symbol); 
-                        setMaxCount(item.quantity); 
-                      }}
-                    >
-                      {t.btn_sell}
-                    </button>
-                  </td>
-                </tr>
-              );
-            })}
+          {sortedLines.map((item, index) => {
+            const isPositive = item.variation >= 0;
+            return (
+              <tr key={index} className={TableTransactionStyles.tr}>
+                <td data-label={t.h_symbol} className={TableTransactionStyles.td} style={{ fontWeight: 'bold' }}>
+                  {item.symbol}
+                </td>
+                <td data-label={t.h_quantity} className={TableTransactionStyles.td}>
+                  {item.quantity?.toFixed(2)}
+                </td>
+                <td data-label={t.h_buy} className={TableTransactionStyles.td}>
+                  {item.averagePriceAtExecution?.toFixed(2)} $
+                </td>
+                <td data-label={t.h_current} className={TableTransactionStyles.td}>
+                  {item.value?.toFixed(2)} $
+                </td>
+                <td data-label={t.h_var_dollar} className={TableTransactionStyles.td} style={{ color: isPositive ? '#2ecc71' : '#e74c3c' }}>
+                  {isPositive ? '+' : ''}{item.variation.toFixed(2)} $
+                </td>
+                <td data-label={t.h_var_percent} className={TableTransactionStyles.td} style={{ color: isPositive ? '#2ecc71' : '#e74c3c' }}>
+                  {item.variationPercent.toFixed(2)} %
+                </td>
+                <td data-label={t.h_gain} className={TableTransactionStyles.td} style={{ fontWeight: 'bold' }}>
+                  {item.gain.toFixed(2)} $
+                </td>
+                <td data-label={t.h_action} className={TableTransactionStyles.td}>
+                  <button
+                    className={TableTransactionStyles.sellButton}
+                    onClick={() => {
+                      setIsOpen(true);
+                      setSymbol(item.symbol);
+                      setMaxCount(item.quantity);
+                    }}
+                  >
+                    {t.btn_sell}
+                  </button>
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
 
-      {/* Pop-up de vente également traduite */}
       <Popup
         title={t.pop_title}
         subtitle={`${t.pop_sub} ${symbol}`}
