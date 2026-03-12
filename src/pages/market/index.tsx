@@ -1,6 +1,6 @@
 import Head from "next/head";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useFetch } from "../../context/FetchContext.js";
 import { useWallet } from "../../context/WalletContext";
 import { useLanguage } from "../../context/LanguageContext";
@@ -10,108 +10,140 @@ import marketStyles from "../../styles/Market.module.css";
 import TableSearch from "../../components/TableSearch.component.jsx";
 import DashBoardLayout from "../../components/layouts/DashBoard.layout";
 
+const MARKET_TO_TYPE: Record<string, string> = {
+  stocks: "us-stock",
+  crypto: "crypto",
+  forex:  "forex",
+};
+
 export default function Market() {
   const { wallets, selectedId, selectWallet } = useWallet();
   const { lang } = useLanguage();
-  const [data, setData] = useState([] as any);
-  const [input, setInput] = useState("");
-  const [marketFilter, setMarketFilter] = useState("all");
   const fetch = useFetch();
+
+  const [input, setInput]                 = useState("");
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [marketFilter, setMarketFilter]   = useState("all");
+  const [symbols, setSymbols]             = useState<any[]>([]);
+  const [page, setPage]                   = useState(1);
+  const [loading, setLoading]             = useState(false);
+  const [hasMore, setHasMore]             = useState(true);
 
   const translations = {
     fr: {
-      headTitle: "InvestTrade - Marchés",
-      title: "Marchés",
-      sub: "Recherchez et analysez les actions en temps réel via Finage",
-      cashLabel: "Disponible",
+      headTitle:      "InvestTrade - Marchés",
+      title:          "Marchés",
+      sub:            "Recherchez et analysez les actions en temps réel via Finage",
+      cashLabel:      "Disponible",
       portfolioLabel: "Portfolio n°",
-      placeholder: "Tapez le nom d'une entreprise...",
-      noWarrants: "warrant",
-      filterAll: "Tous",
-      filterStocks: "Actions",
-      filterCrypto: "Crypto",
-      filterForex: "Forex",
+      placeholder:    "Tapez le nom d'une entreprise...",
+      noWarrants:     "warrant",
+      filterAll:      "Tous",
+      filterStocks:   "Actions",
+      filterCrypto:   "Crypto",
+      filterForex:    "Forex",
+      prev:           "← Précédent",
+      next:           "Suivant →",
+      pageLabel:      "Page",
+      loading:        "Chargement...",
+      noResults:      "Aucun résultat",
     },
     en: {
-      headTitle: "InvestTrade - Markets",
-      title: "Markets",
-      sub: "Search and analyze stocks in real-time via Finage",
-      cashLabel: "Available",
+      headTitle:      "InvestTrade - Markets",
+      title:          "Markets",
+      sub:            "Search and analyze stocks in real-time via Finage",
+      cashLabel:      "Available",
       portfolioLabel: "Portfolio #",
-      placeholder: "Type a company name...",
-      noWarrants: "warrant",
-      filterAll: "All",
-      filterStocks: "Stocks",
-      filterCrypto: "Crypto",
-      filterForex: "Forex",
+      placeholder:    "Type a company name...",
+      noWarrants:     "warrant",
+      filterAll:      "All",
+      filterStocks:   "Stocks",
+      filterCrypto:   "Crypto",
+      filterForex:    "Forex",
+      prev:           "← Previous",
+      next:           "Next →",
+      pageLabel:      "Page",
+      loading:        "Loading...",
+      noResults:      "No results",
     }
   };
 
   const t = translations[lang as keyof typeof translations] || translations.fr;
 
-  const defaultStocks = [
-    // Actions
-    { symbol: "AAPL",  name: "Apple Inc.",             market: "stocks" },
-    { symbol: "MSFT",  name: "Microsoft Corporation",  market: "stocks" },
-    { symbol: "GOOGL", name: "Alphabet Inc.",           market: "stocks" },
-    { symbol: "TSLA",  name: "Tesla, Inc.",             market: "stocks" },
-    { symbol: "AMZN",  name: "Amazon.com, Inc.",        market: "stocks" },
-    { symbol: "META",  name: "Meta Platforms, Inc.",    market: "stocks" },
-    { symbol: "NVDA",  name: "NVIDIA Corporation",      market: "stocks" },
-    { symbol: "JPM",   name: "JPMorgan Chase & Co.",    market: "stocks" },
-    { symbol: "V",     name: "Visa Inc.",               market: "stocks" },
-    { symbol: "WMT",   name: "Walmart Inc.",            market: "stocks" },
-    // Crypto
-    { symbol: "BTCUSD",  name: "Bitcoin",          market: "crypto" },
-    { symbol: "ETHUSD",  name: "Ethereum",         market: "crypto" },
-    { symbol: "BNBUSD",  name: "BNB",              market: "crypto" },
-    { symbol: "SOLUSD",  name: "Solana",           market: "crypto" },
-    { symbol: "XRPUSD",  name: "XRP",              market: "crypto" },
-    { symbol: "ADAUSD",  name: "Cardano",          market: "crypto" },
-    { symbol: "DOGEUSD", name: "Dogecoin",         market: "crypto" },
-    { symbol: "AVAXUSD", name: "Avalanche",        market: "crypto" },
-    // Forex
-    { symbol: "EURUSD", name: "Euro / US Dollar",          market: "forex" },
-    { symbol: "GBPUSD", name: "British Pound / US Dollar", market: "forex" },
-    { symbol: "USDJPY", name: "US Dollar / Japanese Yen",  market: "forex" },
-    { symbol: "USDCHF", name: "US Dollar / Swiss Franc",   market: "forex" },
-    { symbol: "AUDUSD", name: "Australian Dollar / USD",   market: "forex" },
-    { symbol: "USDCAD", name: "US Dollar / Canadian Dollar", market: "forex" },
-  ];
+  // ── Chargement des symboles ───────────────────────────────────────
+  const loadSymbols = useCallback(async (filter: string, p: number) => {
+    setLoading(true);
+    try {
+      if (filter === "all") {
+        // Charge les 3 types en parallèle, 3-4 de chaque pour avoir ~10 au total
+        const [stocksRes, cryptoRes, forexRes] = await Promise.allSettled([
+          fetch.get(`/api/stock/symbols?type=us-stock&page=${p}`),
+          fetch.get(`/api/stock/symbols?type=crypto&page=${p}`),
+          fetch.get(`/api/stock/symbols?type=forex&page=${p}`),
+        ]);
+
+        const stocks = stocksRes.status === "fulfilled" ? (stocksRes.value?.symbols || []).slice(0, 4) : [];
+        const crypto = cryptoRes.status === "fulfilled" ? (cryptoRes.value?.symbols || []).slice(0, 3) : [];
+        const forex  = forexRes.status  === "fulfilled" ? (forexRes.value?.symbols  || []).slice(0, 3) : [];
+
+        const combined = [...stocks, ...crypto, ...forex];
+        setSymbols(combined);
+        setHasMore(combined.length > 0);
+      } else {
+        const type = MARKET_TO_TYPE[filter] || "us-stock";
+        const res = await fetch.get(`/api/stock/symbols?type=${type}&page=${p}`);
+        const list = (res?.symbols || []).slice(0, 10);
+        setSymbols(list);
+        setHasMore((res?.symbols || []).length > 0);
+      }
+    } catch (err) {
+      console.error("Load symbols error:", err);
+      setSymbols([]);
+      setHasMore(false);
+    } finally {
+      setLoading(false);
+    }
+  }, [fetch]);
 
   useEffect(() => {
-    const delayDebounceFn = setTimeout(() => {
+    if (!input.trim()) {
+      loadSymbols(marketFilter, page);
+    }
+  }, [marketFilter, page]);
+
+  function handleFilterChange(key: string) {
+    setMarketFilter(key);
+    setPage(1);
+    setInput("");
+    setSearchResults([]);
+  }
+
+  // ── Recherche avec debounce ───────────────────────────────────────
+  useEffect(() => {
+    const delay = setTimeout(() => {
       if (input.trim().length > 1) {
         fetch.get("/api/stock/search?term=" + input)
-          .then((results) => setData(results))
+          .then((results) => setSearchResults(results || []))
           .catch((err) => console.error("Search Error:", err));
-      } else if (input === "") {
-        setData([]);
+      } else {
+        setSearchResults([]);
       }
     }, 600);
-
-    return () => clearTimeout(delayDebounceFn);
+    return () => clearTimeout(delay);
   }, [input]);
 
   const onChange = (e: any) => setInput(e.target.value);
-
-  const handleKeyDown = (event: any) => {
-    if (event.key === "Escape") {
-      setInput("");
-      setData([]);
-    }
+  const handleKeyDown = (e: any) => {
+    if (e.key === "Escape") { setInput(""); setSearchResults([]); }
   };
 
-  const rawList = (data && data.length > 0)
-    ? data
+  // ── Liste affichée ────────────────────────────────────────────────
+  const isSearching = input.trim().length > 1;
+  const displayList = isSearching
+    ? searchResults
         .filter((item: any) => !item.name?.toLowerCase().includes(t.noWarrants))
         .map((item: any) => ({ symbol: item.symbol, name: item.name, market: item.market || "stocks" }))
-    : defaultStocks;
-
-  // Filtre par marché
-  const list = marketFilter === "all"
-    ? rawList
-    : rawList.filter((item: any) => item.market === marketFilter);
+    : symbols;
 
   const filters = [
     { key: "all",    label: t.filterAll },
@@ -119,6 +151,19 @@ export default function Market() {
     { key: "crypto", label: t.filterCrypto },
     { key: "forex",  label: t.filterForex },
   ];
+
+  const btnStyle = (active: boolean) => ({
+    padding: '8px 20px',
+    borderRadius: '20px',
+    border: 'none',
+    cursor: 'pointer',
+    fontWeight: '700' as const,
+    fontSize: '13px',
+    transition: 'all 0.15s ease',
+    backgroundColor: active ? '#f3ca3e' : '#f0f0f0',
+    color: active ? '#1a1a1a' : '#888',
+    boxShadow: active ? '0 2px 8px rgba(243,202,62,0.4)' : 'none',
+  });
 
   return (
     <>
@@ -129,13 +174,14 @@ export default function Market() {
       </Head>
 
       <main className={homeStyles.pageContainer}>
+
+        {/* Header */}
         <div className={homeStyles.marketHeader} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
           <div>
             <h1 className={homeStyles.marketTitle}>{t.title}</h1>
             <p className={homeStyles.marketSub}>{t.sub}</p>
           </div>
-
-          <div className={homeStyles.statCard} style={{ display: 'flex', alignItems: 'center', padding: '12px 25px', backgroundColor: '#fff', borderRadius: '12px', boxShadow: '0 2px 10px rgba(0,0,0,0.05)' }}>
+          <div className={homeStyles.statCard} style={{ display: 'flex', alignItems: 'center', padding: '12px 25px' }}>
             <Image src="/assets/cash.svg" width={25} height={25} alt="cash" style={{ marginRight: '12px' }} />
             <div>
               <span style={{ fontSize: '11px', color: '#888', display: 'block', textTransform: 'uppercase' }}>{t.cashLabel}</span>
@@ -170,38 +216,73 @@ export default function Market() {
               value={input}
               onChange={onChange}
               onKeyDown={handleKeyDown}
-              style={{ height: '50px', border: 'none', width: '100%', paddingLeft: '0', outline: 'none', fontSize: '16px', backgroundColor: 'transparent' }}
+              style={{ height: '50px', border: 'none', width: '100%', outline: 'none', fontSize: '16px', backgroundColor: 'transparent' }}
             />
+            {input && (
+              <button onClick={() => { setInput(""); setSearchResults([]); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#aaa', fontSize: '18px', lineHeight: 1 }}>
+                ✕
+              </button>
+            )}
           </div>
         </div>
 
         {/* Filtres marché */}
         <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', marginBottom: '30px', flexWrap: 'wrap' }}>
           {filters.map((f) => (
-            <button
-              key={f.key}
-              onClick={() => setMarketFilter(f.key)}
-              style={{
-                padding: '8px 20px',
-                borderRadius: '20px',
-                border: 'none',
-                cursor: 'pointer',
-                fontWeight: '700',
-                fontSize: '13px',
-                transition: 'all 0.15s ease',
-                backgroundColor: marketFilter === f.key ? '#f3ca3e' : '#f0f0f0',
-                color: marketFilter === f.key ? '#1a1a1a' : '#888',
-                boxShadow: marketFilter === f.key ? '0 2px 8px rgba(243,202,62,0.4)' : 'none',
-              }}
-            >
+            <button key={f.key} onClick={() => handleFilterChange(f.key)} style={btnStyle(marketFilter === f.key)}>
               {f.label}
             </button>
           ))}
         </div>
 
+        {/* Tableau */}
         <div className={homeStyles.assetCard} style={{ padding: '0', overflow: 'hidden', borderRadius: '15px' }}>
-          <TableSearch data={list} lang={lang} />
+          {loading ? (
+            <div style={{ textAlign: 'center', padding: '60px', color: '#aaa', fontSize: '14px' }}>
+              {t.loading}
+            </div>
+          ) : displayList.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '60px', color: '#aaa', fontSize: '14px' }}>
+              {t.noResults}
+            </div>
+          ) : (
+            <TableSearch data={displayList} lang={lang} />
+          )}
         </div>
+
+        {/* Pagination — cachée pendant une recherche */}
+        {!isSearching && (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '16px', marginTop: '24px' }}>
+            <button
+              onClick={() => setPage(p => Math.max(1, p - 1))}
+              disabled={page === 1 || loading}
+              style={{
+                ...btnStyle(page > 1),
+                opacity: page === 1 ? 0.4 : 1,
+                cursor: page === 1 ? 'not-allowed' : 'pointer',
+              }}
+            >
+              {t.prev}
+            </button>
+
+            <span style={{ fontWeight: '700', fontSize: '14px', color: '#555' }}>
+              {t.pageLabel} {page}
+            </span>
+
+            <button
+              onClick={() => setPage(p => p + 1)}
+              disabled={!hasMore || loading}
+              style={{
+                ...btnStyle(true),
+                opacity: !hasMore ? 0.4 : 1,
+                cursor: !hasMore ? 'not-allowed' : 'pointer',
+              }}
+            >
+              {t.next}
+            </button>
+          </div>
+        )}
+
       </main>
     </>
   );

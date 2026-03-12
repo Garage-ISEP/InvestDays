@@ -93,7 +93,7 @@ function TableSearch({ data, lang }) {
                     transition: 'transform 0.2s'
                   }}
                   onClick={() => {
-                    router.push(`/market/${item?.symbol}?name=${encodeURIComponent(item?.name || "")}`);
+                    router.push(`/market/${item?.symbol}?name=${encodeURIComponent(item?.name || "")}&market=${item?.market || "stocks"}`);
                   }}
                   onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
                   onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}

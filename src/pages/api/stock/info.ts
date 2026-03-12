@@ -13,10 +13,11 @@ async function info(req: Request, res: NextApiResponse<any>) {
   if (req.method !== "GET") {
     throw `Method ${req.method} not allowed`;
   }
-  const { symbol, time } = req.query; // On récupère l'intervalle envoyé par le front
+  const { symbol, time, market } = req.query; // On récupère l'intervalle envoyé par le front
 
   const clientIp = requestIp.getClientIp(req);
   if (typeof symbol != "string") throw "Invalid request";
+  
 
   // Correction : On fait correspondre tes boutons (1d, 1w) aux termes de Twelve Data
   const timeMapping: { [key: string]: string } = {
@@ -33,10 +34,11 @@ async function info(req: Request, res: NextApiResponse<any>) {
 
   const resp = await stocksService.getRecentPrices(
     symbol.toUpperCase(),
-    selectedInterval as any, // On envoie "day", "week" ou "month"
+    selectedInterval as any,
     req.auth.sub,
     clientIp as string,
     false,
+    (market as string) || "stocks", 
   );
 
   return res.status(200).json(resp);

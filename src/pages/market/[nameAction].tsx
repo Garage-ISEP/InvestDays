@@ -14,42 +14,38 @@ import HighchartsReact from "highcharts-react-official";
 import { useAuthentification } from "../../context/AuthContext";
 
 export default function DetailAction(req: Request) {
-  const [logo, setLogo] = useState("");
   const [data, setData] = useState<any>({ results: [] });
   const [isOpen, setIsOpen] = useState(false);
   const [detail, setDetail] = useState<any>({});
   const [chartReady, setChartReady] = useState(false);
   const [chartType, setChartType] = useState<"line" | "candlestick">("line");
+  const [loadingChart, setLoadingChart] = useState(true);
 
   const { user, isAuthenticated } = useAuthentification();
   const { wallets, selectedId, getPrice } = useWallet();
   const { lang } = useLanguage();
   const router = useRouter();
-  const { nameAction, name } = router.query;
+  const { nameAction, name, market } = router.query;
   const fetch = useFetch();
-
-  const [dataCleaned, setDataCleaned] = useState({
-    name: "-",
-    market_cap: "-",
-    number: "-",
-  });
 
   const translations = {
     fr: {
-      cashLabel: "Cash (P.",
+      cashLabel: "Disponible (P.",
       buyBtn: "Acheter",
       popTitle: "Acheter",
-      popSub: "Achat d'actions",
+      popSub: "Achat de",
       loading: "Chargement du graphique...",
+      noData: "Aucune donnée historique disponible.",
       line: "Courbe",
       candle: "Bougies",
     },
     en: {
-      cashLabel: "Cash (P.",
+      cashLabel: "Available (P.",
       buyBtn: "Buy",
       popTitle: "Buy",
-      popSub: "Purchase shares",
+      popSub: "Purchase of",
       loading: "Loading chart...",
+      noData: "No historical data available.",
       line: "Line",
       candle: "Candlestick",
     }
@@ -57,265 +53,223 @@ export default function DetailAction(req: Request) {
 
   const t = translations[lang as keyof typeof translations] || translations.fr;
 
-  // Données courbe : [timestamp, close]
-  const lineData = useMemo(() => {
-    if (data?.results && Array.isArray(data.results)) {
-      return data.results.map((i: any) => [Number(i.t), i.c]);
-    }
-    return [];
-  }, [data]);
-
-  // Données bougies : [timestamp, open, high, low, close]
-  const candleData = useMemo(() => {
-    if (data?.results && Array.isArray(data.results)) {
-      return data.results.map((i: any) => [
-        Number(i.t),
-        i.o ?? i.c,
-        i.h ?? i.c,
-        i.l ?? i.c,
-        i.c,
-      ]);
-    }
-    return [];
-  }, [data]);
+  const lineData = useMemo(() => (data?.results || []).map((i: any) => [Number(i.t), i.c]), [data]);
+  const candleData = useMemo(() => (data?.results || []).map((i: any) => [Number(i.t), i.o ?? i.c, i.h ?? i.c, i.l ?? i.c, i.c]), [data]);
 
   useEffect(() => {
-    const loadExporting = async () => {
+    const initHC = async () => {
       if (typeof window !== "undefined") {
         try {
-          const exportingModule = await import("highcharts/modules/exporting");
-          (exportingModule.default as any)(Highcharts);
+          const Exporting = await import("highcharts/modules/exporting");
+          const factory = (Exporting as any).default || Exporting;
+          if (typeof factory === 'function') factory(Highcharts);
           setChartReady(true);
-        } catch (err) {
+        } catch (e) {
           setChartReady(true);
         }
       }
     };
-    loadExporting();
+    initHC();
   }, []);
-
-  function format(n: any) {
-    if (!n || isNaN(n)) return "-";
-    const num = Number(n);
-    if (num >= 1e9) return (num / 1e9).toFixed(2) + " B";
-    if (num >= 1e6) return (num / 1e6).toFixed(2) + " M";
-    if (num >= 1000) return (num / 1000).toFixed(2) + " K";
-    return num.toString();
-  }
 
   async function fetchDetail(symbol: string) {
     try {
       const response = await fetch.get("/api/stock/detail?symbol=" + symbol);
       const price = await getPrice(symbol);
       setDetail({ ...response.results, price });
-      if (response.results?.branding?.logo_url) {
-        fetchLogo(response.results.branding.logo_url);
-      }
-    } catch (error) {
-      console.error("Error fetching detail:", error);
-    }
+    } catch (e) { console.error(e); }
   }
 
-  async function fetchLogo(url: string) {
+  async function fetchData(symbol: string) {
+    setLoadingChart(true);
+    const m = (market as string) || (router.query.market as string) || "stocks";
     try {
-      const logoData = await fetch.get("/api/stock/getLogo?url=" + url, true);
-      setLogo(logoData);
-    } catch (e) {
-      setLogo("");
-    }
-  }
-
-  function fetchData(symbol: string) {
-    fetch.get("/api/stock/info?symbol=" + symbol)
-      .then((res) => setData(res || { results: [] }))
-      .catch((err) => console.error("Error fetching chart data:", err));
+      const res = await fetch.get(`/api/stock/info?symbol=${symbol}&market=${m}`);
+      setData(res || { results: [] });
+    } catch (e) { setData({ results: [] }); }
+    finally { setLoadingChart(false); }
   }
 
   useEffect(() => {
-    if (user && isAuthenticated && nameAction) {
+    if (router.isReady && user && isAuthenticated && nameAction) {
       fetchData(nameAction as string);
       fetchDetail(nameAction as string);
     }
-  }, [nameAction, isAuthenticated, user]);
+  }, [router.isReady, nameAction, isAuthenticated, user]);
 
   useEffect(() => {
-    if (detail) {
-      setDataCleaned({
-        name: (name as string) || detail.name || (nameAction as string) || "-",
-        market_cap: detail.market_cap || "-",
-        number: detail.weighted_shares_outstanding || "-",
-      });
+    if (!detail?.price && data?.results?.length > 0) {
+      const lastPoint = data.results[data.results.length - 1];
+      if (lastPoint?.c) setDetail((prev: any) => ({ ...prev, price: lastPoint.c }));
     }
-  }, [detail, nameAction, name]);
+  }, [data, detail?.price]);
 
-  const commonConfig = {
-    chart: {
-      height: 500,
-      backgroundColor: 'transparent',
-      animation: false,
-    },
-    xAxis: {
-      type: 'datetime',
-      labels: { style: { color: '#888' } },
-      ordinal: true,
-    },
-    yAxis: {
-      labels: { style: { color: '#888' }, format: '{value}$' },
-      opposite: true,
-    },
-    rangeSelector: {
-      enabled: true,
-      selected: 3,
-      inputDateFormat: lang === 'fr' ? '%e %B %Y' : '%B %e, %Y',
-      inputEditDateFormat: '%Y-%m-%d',
-      inputBoxWidth: 100,
-      buttonTheme: {
-        fill: 'none',
-        stroke: 'none',
-        r: 8,
-        style: { color: '#888', fontWeight: '600' },
-        states: { select: { fill: '#f3ca3e', style: { color: '#000' } } },
-      },
-      inputStyle: { color: '#f3ca3e', fontWeight: '700', fontSize: '13px' },
-      labelStyle: { color: '#888', textTransform: 'uppercase', fontSize: '10px' },
-      buttons: lang === "fr"
-        ? [{ type: 'month', count: 1, text: '1m' }, { type: 'month', count: 3, text: '3m' }, { type: 'all', text: 'Tout' }]
-        : [{ type: 'month', count: 1, text: '1m' }, { type: 'month', count: 3, text: '3m' }, { type: 'all', text: 'All' }],
-    },
-    plotOptions: {
-      series: { animation: false, dataGrouping: { enabled: true } },
-    },
-    navigator: { enabled: true },
-    scrollbar: { enabled: false },
-    credits: { enabled: false },
-  };
-
-  const lineOptions = {
-    ...commonConfig,
-    series: [{
-      type: 'line',
-      name: nameAction || "Stock",
-      data: lineData,
-      color: '#f3ca3e',
-      tooltip: {
-        valueDecimals: 2,
-        xDateFormat: lang === 'fr' ? '%A %e %B %Y' : '%A, %b %e, %Y',
-      },
-    }],
-  };
-
-  const candleOptions = {
-    ...commonConfig,
-    series: [{
-      type: 'candlestick',
-      name: nameAction || "Stock",
-      data: candleData,
-      color: '#e74c3c',
-      upColor: '#2ecc71',
-      lineColor: '#e74c3c',
-      upLineColor: '#2ecc71',
-      tooltip: {
-        valueDecimals: 2,
-        xDateFormat: lang === 'fr' ? '%A %e %B %Y' : '%A, %b %e, %Y',
-      },
-    }],
-  };
-
-  const hasData = chartType === "line" ? lineData.length > 0 : candleData.length > 0;
-
+  // Style des boutons : Taille moyenne
   const toggleBtnStyle = (active: boolean) => ({
-    padding: '6px 18px',
+    padding: '8px 18px', 
     borderRadius: '20px',
     border: 'none',
     cursor: 'pointer',
     fontWeight: '700' as const,
-    fontSize: '13px',
+    fontSize: '12px', 
     transition: 'all 0.15s ease',
     backgroundColor: active ? '#f3ca3e' : '#f0f0f0',
     color: active ? '#1a1a1a' : '#888',
     boxShadow: active ? '0 2px 8px rgba(243,202,62,0.4)' : 'none',
   });
 
+  const commonConfig: any = {
+    chart: { height: 500, backgroundColor: 'transparent', animation: false },
+    xAxis: { type: 'datetime', labels: { style: { color: '#888' } }, ordinal: true },
+    yAxis: { labels: { style: { color: '#888' }, format: '{value}$' }, opposite: true, gridLineColor: '#f5f5f5' },
+    rangeSelector: {
+      selected: 3,
+      inputStyle: { color: '#f3ca3e', fontWeight: '700' },
+      labelStyle: { color: '#888' },
+      buttonTheme: {
+        fill: 'none', stroke: 'none', r: 8,
+        style: { color: '#888', fontWeight: '600' },
+        states: { select: { fill: '#f3ca3e', style: { color: '#000' } } }
+      },
+      buttons: [
+        { type: 'month', count: 1, text: '1m' },
+        { type: 'month', count: 3, text: '3m' },
+        { type: 'all', text: lang === 'fr' ? 'Tout' : 'All' }
+      ]
+    },
+    navigator: { enabled: true, maskFill: 'rgba(243, 202, 62, 0.05)', series: { color: '#f3ca3e' } },
+    credits: { enabled: false },
+    plotOptions: {
+      line: { color: '#f3ca3e', lineWidth: 2 }, // Force le jaune pour toutes les lignes
+      series: { animation: false }
+    }
+  };
+
+  const hasData = chartType === "line" ? lineData.length > 0 : candleData.length > 0;
+
   return (
     <>
-      <Head>
-        <title>InvestDays - {nameAction}</title>
-      </Head>
+      <Head><title>InvestDays - {nameAction}</title></Head>
 
       <main className={homeStyles.pageContainer}>
         <div className={homeStyles.marketHeader}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-            <div>
-              <h1 className={homeStyles.marketTitle}>{nameAction as string}</h1>
-              <p className={homeStyles.marketSub}>
-                {dataCleaned.name} • {detail?.price ? `${detail.price.toFixed(2)}$` : "- $"}
-              </p>
-            </div>
+          <div>
+            <h1 className={homeStyles.marketTitle}>{nameAction as string}</h1>
+            <p className={homeStyles.marketSub}>
+              {(name as string) || detail?.name || nameAction} • {
+                detail?.price 
+                  ? (detail.price < 0.1 
+                      ? `${detail.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 })}$` 
+                      : `${detail.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}$`)
+                  : "- $"
+              }
+            </p>
           </div>
 
           <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
-            <div className={homeStyles.statCard} style={{ display: 'flex', alignItems: 'center', padding: '10px 20px' }}>
-              <Image src="/assets/cash.svg" width={25} height={25} alt="cash" style={{ marginRight: '10px' }} />
+            <div className={homeStyles.statCard} style={{ display: 'flex', alignItems: 'center', padding: '12px 25px' }}>
+              <Image 
+                src="/assets/cash.svg" 
+                width={25} 
+                height={25} 
+                alt="cash" 
+                style={{ marginRight: '12px' }} 
+              />
               <div>
-                <span style={{ fontSize: '11px', color: '#888', display: 'block' }}>
+                <span style={{ 
+                  fontSize: '11px', 
+                  color: '#888', 
+                  display: 'block', 
+                  textTransform: 'uppercase' 
+                }}>
                   {t.cashLabel}{selectedId + 1})
                 </span>
-                <span style={{ fontWeight: '700' }}>
-                  {wallets[selectedId]?.cash ? wallets[selectedId].cash.toFixed(2) : "0.00"} $
+                <span style={{ 
+                  fontWeight: '700', 
+                  fontSize: '18px' 
+                }}>
+                  {(wallets[selectedId]?.cash || 0).toLocaleString()} $
                 </span>
               </div>
             </div>
-            <button
-              className={homeStyles.buyButton}
-              style={{ width: '140px' }}
-              onClick={() => setIsOpen(true)}
-            >
+            <button className={homeStyles.buyButton} style={{ width: '160px', padding: '14px' }} onClick={() => setIsOpen(true)}>
               {t.buyBtn}
             </button>
           </div>
         </div>
 
-        <div className={homeStyles.assetCard} style={{ marginBottom: '30px', padding: '20px', minHeight: '500px' }}>
-
-          {/* Toggle courbe / bougies */}
-          <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
-            <button onClick={() => setChartType("line")} style={toggleBtnStyle(chartType === "line")}>
+        <div className={homeStyles.assetCard} style={{ minHeight: '600px' }}>
+          
+          <div className={homeStyles.filterBar} style={{ marginBottom: '25px', gap: '10px' }}>
+            <button 
+              onClick={() => setChartType("line")} 
+              style={toggleBtnStyle(chartType === "line")}
+            >
               📈 {t.line}
             </button>
-            <button onClick={() => setChartType("candlestick")} style={toggleBtnStyle(chartType === "candlestick")}>
+            <button 
+              onClick={() => setChartType("candlestick")} 
+              style={toggleBtnStyle(chartType === "candlestick")}
+            >
               🕯️ {t.candle}
             </button>
           </div>
 
-          {chartReady && hasData ? (
-            <HighchartsReact
-              key={`chart-${lang}-${nameAction}-${chartType}-${lineData.length}`}
-              highcharts={Highcharts}
-              constructorType={"stockChart"}
-              options={chartType === "line" ? lineOptions : candleOptions}
+          {loadingChart ? (
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '450px', color: '#888' }}>
+              {t.loading}
+            </div>
+          ) : chartReady && hasData ? (
+            <HighchartsReact 
+              key={`${nameAction}-${chartType}`} 
+              highcharts={Highcharts} 
+              constructorType={"stockChart"} 
+              options={{
+                ...commonConfig, 
+                series: [
+                  chartType === "line" 
+                    ? { 
+                        type: 'line', 
+                        name: nameAction, 
+                        data: lineData, 
+                        color: '#f3ca3e',
+                        lineColor: '#f3ca3e',  // ← ajoute ça
+                        lineWidth: 2, 
+                        tooltip: { valueDecimals: 4 } 
+                      }
+                    : { 
+                        type: 'candlestick', 
+                        name: nameAction, 
+                        data: candleData, 
+                        color: '#e74c3c', 
+                        upColor: '#2ecc71', 
+                        lineColor: '#e74c3c', 
+                        upLineColor: '#2ecc71' 
+                      }
+                ]
+              }} 
             />
           ) : (
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '400px', color: '#888' }}>
-              {t.loading}
+            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '400px', textAlign: 'center' }}>
+              <span style={{ fontSize: '50px', marginBottom: '10px' }}>📊</span>
+              <p style={{ color: '#e74c3c', fontWeight: '800' }}>{t.noData}</p>
             </div>
           )}
         </div>
 
-        <Popup
-          title={t.popTitle}
-          subtitle={`${t.popSub} ${nameAction}`}
-          maxCount={detail?.price ? Math.floor((wallets[selectedId]?.cash || 0) / detail.price) : 0}
-          symbol={nameAction as string}
-          sell={false}
-          open={isOpen}
-          close={() => setIsOpen(false)}
-          lang={lang}
+        <Popup 
+          title={t.popTitle} 
+          subtitle={`${t.popSub} ${nameAction}`} 
+          maxCount={detail?.price ? Math.floor((wallets[selectedId]?.cash || 0) / detail.price) : 0} 
+          symbol={nameAction as string} 
+          sell={false} 
+          open={isOpen} 
+          close={() => setIsOpen(false)} 
+          lang={lang} 
         />
       </main>
     </>
   );
 }
 
-DetailAction.getLayout = function getLayout(page: any) {
-  return <DashBoardLayout>{page}</DashBoardLayout>;
-};
+DetailAction.getLayout = (page: any) => <DashBoardLayout>{page}</DashBoardLayout>;
