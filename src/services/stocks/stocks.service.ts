@@ -146,7 +146,7 @@ const stocksService = {
   getRecentPrices, 
   getDetailsStock, 
   getLastPrice, 
-  getLogoStock: async () => "", 
+  getLogoStock: async (url?: string, userId?: number, ip?: string) => "", 
   getPreviousClose 
 };
 
