@@ -8,19 +8,14 @@ export enum times {
   month = "month",
 }
 
-/**
- * DÉTECTION HEURISTIQUE DU TYPE D'ACTIF
- * Améliorée pour gérer les paires longues et les monnaies variées (TRY, EUR, etc.)
- */
+
 function getAssetType(symbol: string): "crypto" | "forex" | "stock" {
   const s = symbol.toUpperCase();
 
-  // 1. Suffixes Crypto prioritaires
   if (s.endsWith("BTC") || s.endsWith("ETH") || s.endsWith("USDT") || s.endsWith("USDC") || s.endsWith("BNB") || s.endsWith("SOL")) {
     return "crypto";
   }
 
-  // 2. Forex Majeurs (Exactement 6 caractères)
   const KNOWN_FOREX = [
     "EURUSD","GBPUSD","USDJPY","USDCHF","AUDUSD","USDCAD",
     "NZDUSD","EURGBP","EURJPY","GBPJPY","USDCNY","USDTRY",
@@ -28,26 +23,21 @@ function getAssetType(symbol: string): "crypto" | "forex" | "stock" {
   ];
   if (KNOWN_FOREX.includes(s)) return "forex";
 
-  // 3. Heuristique : Si plus de 6 caractères, c'est presque toujours de la Crypto (ex: BEAMXTRY)
   if (s.length > 6) return "crypto";
 
-  // 4. Heuristique 6 caractères (ex: PNGUSD)
   if (s.length === 6) {
     const currencies = ["USD","EUR","GBP","JPY","CHF","CAD","AUD","NZD","TRY","ZAR","SGD"];
     const prefix = currencies.includes(s.slice(0, 3));
     const suffix = currencies.includes(s.slice(3, 6));
-    
-    // Si ça finit par une monnaie connue mais que le début n'en est pas une : Crypto
+
     if (suffix && !prefix) return "crypto";
-    // Si les deux sont des monnaies : Forex
     if (suffix && prefix) return "forex";
   }
 
-  // 5. Par défaut : Action
+
   return "stock";
 }
 
-// ── Search ────────────────────────────────────────────────────────────
 async function search(term: string, userId: number, ip: string): Promise<StockApi[]> {
   try {
     const [stockRes, cryptoRes, forexRes] = await Promise.allSettled([
@@ -74,11 +64,9 @@ async function search(term: string, userId: number, ip: string): Promise<StockAp
   } catch (e) { return []; }
 }
 
-// ── Get Last Price ────────────────────────────────────────────────────
 async function getLastPrice(symbol: string, userId: number, ip: string): Promise<any> {
   const type = getAssetType(symbol);
-  
-  // On tente plusieurs catégories au cas où la détection heuristique se trompe
+
   const attemptOrder: ("crypto" | "stock" | "forex")[] = [type, "crypto", "stock"];
 
   for (const t of Array.from(new Set(attemptOrder))) {
@@ -90,7 +78,6 @@ async function getLastPrice(symbol: string, userId: number, ip: string): Promise
       
       let price = data.price || data.p || data.ask || data.bid || ((data.ask + data.bid) / 2);
 
-      // Fallback vers l'agrégat si le prix direct est à 0 ou introuvable
       if (!price || price === 0) {
         const today = new Date().toISOString().split('T')[0];
         const start = new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
@@ -110,7 +97,6 @@ async function getLastPrice(symbol: string, userId: number, ip: string): Promise
   return { results: [] };
 }
 
-// ── Get Recent Prices (Graphique avec Fallback de Catégorie) ──────────
 async function getRecentPrices(
   symbol: string,
   time: times = times.day,
@@ -120,11 +106,10 @@ async function getRecentPrices(
   marketHint?: string
 ): Promise<any> {
   const today = new Date().toISOString().split('T')[0];
-  // On remonte à 180 jours pour les cryptos pour éviter les erreurs sur les jetons récents
+
   const fromDate = time === "month" ? "2022-01-01" : new Date(Date.now() - 180 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
   const timespan = time === "month" ? "week" : "day";
 
-  // Priorité au marketHint du front, sinon détection
   const primary = marketHint === "stocks" ? "stock" : (marketHint || getAssetType(symbol));
   const attemptOrder = primary === "crypto" ? ["crypto", "stock"] : [primary, "stock", "crypto"];
 
@@ -146,7 +131,7 @@ async function getRecentPrices(
   return { results: [] };
 }
 
-// ── Autres Fonctions ──────────────────────────────────────────────────
+
 async function getDetailsStock(symbol: string) {
   return { results: { name: symbol.toUpperCase(), branding: { logo_url: null } } };
 }

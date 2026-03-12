@@ -70,12 +70,10 @@ export default function Market() {
 
   const t = translations[lang as keyof typeof translations] || translations.fr;
 
-  // ── Chargement des symboles ───────────────────────────────────────
   const loadSymbols = useCallback(async (filter: string, p: number) => {
     setLoading(true);
     try {
       if (filter === "all") {
-        // Charge les 3 types en parallèle, 3-4 de chaque pour avoir ~10 au total
         const [stocksRes, cryptoRes, forexRes] = await Promise.allSettled([
           fetch.get(`/api/stock/symbols?type=us-stock&page=${p}`),
           fetch.get(`/api/stock/symbols?type=crypto&page=${p}`),
@@ -117,8 +115,6 @@ export default function Market() {
     setInput("");
     setSearchResults([]);
   }
-
-  // ── Recherche avec debounce ───────────────────────────────────────
   useEffect(() => {
     const delay = setTimeout(() => {
       if (input.trim().length > 1) {
@@ -136,8 +132,6 @@ export default function Market() {
   const handleKeyDown = (e: any) => {
     if (e.key === "Escape") { setInput(""); setSearchResults([]); }
   };
-
-  // ── Liste affichée ────────────────────────────────────────────────
   const isSearching = input.trim().length > 1;
   const displayList = isSearching
     ? searchResults

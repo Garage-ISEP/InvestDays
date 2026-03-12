@@ -233,7 +233,7 @@ export default function DetailAction(req: Request) {
                         name: nameAction, 
                         data: lineData, 
                         color: '#f3ca3e',
-                        lineColor: '#f3ca3e',  // ← ajoute ça
+                        lineColor: '#f3ca3e', 
                         lineWidth: 2, 
                         tooltip: { valueDecimals: 4 } 
                       }
