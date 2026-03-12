@@ -120,6 +120,7 @@ export default function DetailAction(req: Request) {
 
   const commonConfig: any = {
     chart: { height: 500, backgroundColor: 'transparent', animation: false },
+    accessibility: { enabled: false },
     xAxis: { type: 'datetime', labels: { style: { color: '#888' } }, ordinal: true },
     yAxis: { labels: { style: { color: '#888' }, format: '{value}$' }, opposite: true, gridLineColor: '#f5f5f5' },
     rangeSelector: {

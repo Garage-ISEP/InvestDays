@@ -132,11 +132,11 @@ async function getRecentPrices(
 }
 
 
-async function getDetailsStock(symbol: string) {
+async function getDetailsStock(symbol: string, userId?: number, ip?: string) {
   return { results: { name: symbol.toUpperCase(), branding: { logo_url: null } } };
 }
 
-async function getPreviousClose(symbol: string) {
+async function getPreviousClose(symbol: string, userId?: number, ip?: string) {
     const res = await getLastPrice(symbol, 0, "");
     return res.results?.[0]?.price || null;
 }
@@ -146,7 +146,7 @@ const stocksService = {
   getRecentPrices, 
   getDetailsStock, 
   getLastPrice, 
-  getLogoStock: async () => "", 
+  getLogoStock: async (url?: string, userId?: number, ip?: string) => "", 
   getPreviousClose 
 };
 
