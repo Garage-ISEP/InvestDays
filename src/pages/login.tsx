@@ -54,7 +54,7 @@ const handleLoginISEP = () => {
 
           {/* Logo au dessus */}
           <div className={styles.logoWrap}>
-            <Image src="/assets/INVEST.png" width={210} height={210} alt="InvestDays" priority />
+            <Image src="/assets/INVEST.png" width={210} height={210} alt="InvestDays" />
           </div>
 
           {/* Carte */}
