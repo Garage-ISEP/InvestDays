@@ -120,6 +120,7 @@ export default function DetailAction(req: Request) {
 
   const commonConfig: any = {
     chart: { height: 500, backgroundColor: 'transparent', animation: false },
+    accessibility: { enabled: false },
     xAxis: { type: 'datetime', labels: { style: { color: '#888' } }, ordinal: true },
     yAxis: { labels: { style: { color: '#888' }, format: '{value}$' }, opposite: true, gridLineColor: '#f5f5f5' },
     rangeSelector: {
@@ -140,7 +141,7 @@ export default function DetailAction(req: Request) {
     navigator: { enabled: true, maskFill: 'rgba(243, 202, 62, 0.05)', series: { color: '#f3ca3e' } },
     credits: { enabled: false },
     plotOptions: {
-      line: { color: '#f3ca3e', lineWidth: 2 }, // Force le jaune pour toutes les lignes
+      line: { color: '#f3ca3e', lineWidth: 2 }, 
       series: { animation: false }
     }
   };
