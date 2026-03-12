@@ -24,7 +24,7 @@ function Navbar() {
       <div className={navBarStyles.leftSection}>
         <div className={navBarStyles.logoContainerLeft}>
           <Link href={"/"}>
-            <Image src="/assets/INVEST.png" width={100} height={120} alt="logo" priority />
+            <Image src="/assets/INVEST.png" width={100} height={120} alt="logo" />
           </Link>
         </div>
 

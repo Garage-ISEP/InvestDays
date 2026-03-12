@@ -116,107 +116,16 @@ export default function Home() {
         <link rel="icon" href="/favicon3.ico" />
       </Head>
 
-      <style>{`
-        .rules-grid {
-          display: grid;
-          grid-template-columns: repeat(4, 1fr);
-          gap: 16px;
-        }
-        .rule-card {
-          background: #fff;
-          border-radius: 16px;
-          padding: 24px;
-          box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-          border: 1px solid #f0f0f0;
-          display: flex;
-          flex-direction: column;
-          gap: 10px;
-          transition: transform 0.15s ease, box-shadow 0.15s ease;
-          cursor: default;
-        }
-        .rule-card:hover {
-          transform: translateY(-3px);
-          box-shadow: 0 6px 20px rgba(0,0,0,0.1);
-        }
-        .stats-grid {
-          display: grid;
-          grid-template-columns: repeat(4, 1fr);
-          gap: 16px;
-          margin-top: 20px;
-        }
-        .stat-card {
-          background: #fff;
-          border-radius: 16px;
-          padding: 20px 24px;
-          box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-          border: 1px solid #f0f0f0;
-        }
-        .dashboard-grid {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 20px;
-          margin-top: 20px;
-        }
-        .panel {
-          background: #fff;
-          border-radius: 16px;
-          padding: 24px;
-          box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-          border: 1px solid #f0f0f0;
-        }
-        .asset-row {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding: 12px 0;
-          border-bottom: 1px solid #f5f5f5;
-        }
-        .asset-row:last-child { border-bottom: none; }
-        .tx-row {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding: 10px 0;
-          border-bottom: 1px solid #f5f5f5;
-          font-size: 13px;
-        }
-        .tx-row:last-child { border-bottom: none; }
-        .finage-logo {
-          display: flex;
-          flex-direction: column;
-          align-items: flex-end;
-          gap: 4px;
-          padding-right: 80px;
-        }
-        .section-header {
-          margin: 40px 0 20px 0;
-        }
-        @media (max-width: 1100px) {
-          .rules-grid { grid-template-columns: repeat(3, 1fr); }
-          .stats-grid { grid-template-columns: repeat(2, 1fr); }
-        }
-        @media (max-width: 768px) {
-          .rules-grid { grid-template-columns: repeat(2, 1fr); }
-          .dashboard-grid { grid-template-columns: 1fr; }
-          .finage-logo { padding-right: 20px; }
-        }
-        @media (max-width: 480px) {
-          .rules-grid { grid-template-columns: 1fr; }
-          .stats-grid { grid-template-columns: 1fr 1fr; }
-          .finage-logo { display: none; }
-        }
-      `}</style>
-
       <main className={homeStyles.pageContainer}>
         {/* Bande jaune */}
-        <div className={homeStyles.welcomeSection} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div className={homeStyles.welcomeSection}>
           <div>
             <h1 className={homeStyles.marketTitle}>
-              {t.hello} 👋
+              {t.hello} {(user as any)?.username || (user as any)?.email?.split('@')[0]} 👋
             </h1>
             <p className={homeStyles.marketSub}>{t.sub}</p>
           </div>
-          <div className="finage-logo">
+          <div className={homeStyles.partnerBrand}>
             <span style={{ fontSize: '11px', color: 'rgba(0,0,0,0.5)', fontWeight: '500' }}>{t.poweredBy}</span>
             <a href="https://finage.co.uk" target="_blank" rel="noreferrer">
               <img src="/assets/partners/finage_logo.svg" alt="Finage" style={{ height: '28px', objectFit: 'contain' }} />
@@ -224,49 +133,33 @@ export default function Home() {
           </div>
         </div>
 
-        {/* ── RÈGLES DU JEU ── */}
-        <div className="section-header">
-          <h2 style={{ fontSize: '20px', fontWeight: '800', color: '#1a1a1a', margin: 0 }}>{t.rulesTitle}</h2>
-          <p style={{ fontSize: '14px', color: '#888', marginTop: '6px' }}>{t.rulesSub}</p>
-        </div>
-        <div className="rules-grid">
-          {t.rules.map((rule, index) => (
-            <div key={index} className="rule-card">
-              <div style={{ fontSize: '26px' }}>{rule.icon}</div>
-              <div style={{ fontSize: '14px', fontWeight: '700', color: '#1a1a1a' }}>{rule.title}</div>
-              <div style={{ fontSize: '12px', color: '#666', lineHeight: '1.6' }}>{rule.desc}</div>
-            </div>
-          ))}
+        {/* ── MON TABLEAU DE BORD ── */}
+        <div className={homeStyles.sectionHeader} style={{ marginTop: '30px' }}>
+          <h2 className={homeStyles.sectionTitle}>{t.dashTitle}</h2>
         </div>
 
-        {/* ── DASHBOARD ── */}
-        <div className="section-header" style={{ marginTop: '50px' }}>
-          <h2 style={{ fontSize: '20px', fontWeight: '800', color: '#1a1a1a', margin: 0 }}>{t.dashTitle}</h2>
-        </div>
-
-        {/* Stats */}
-        <div className="stats-grid">
-          <div className="stat-card">
-            <div style={{ fontSize: '11px', color: '#888', fontWeight: '600', marginBottom: '8px', textTransform: 'uppercase' }}>{t.cashLabel}</div>
-            <div style={{ fontSize: '20px', fontWeight: '800', color: '#1a1a1a' }}>
+        <div className={homeStyles.statsGrid}>
+          <div className={homeStyles.statCard}>
+            <div className={homeStyles.statLabel}>{t.cashLabel}</div>
+            <div className={homeStyles.statValue}>
               {cash.toLocaleString(undefined, { minimumFractionDigits: 2 })} $
             </div>
           </div>
-          <div className="stat-card">
-            <div style={{ fontSize: '11px', color: '#888', fontWeight: '600', marginBottom: '8px', textTransform: 'uppercase' }}>{t.assetsLabel}</div>
-            <div style={{ fontSize: '20px', fontWeight: '800', color: '#1a1a1a' }}>
+          <div className={homeStyles.statCard}>
+            <div className={homeStyles.statLabel}>{t.assetsLabel}</div>
+            <div className={homeStyles.statValue}>
               {assetsCached.toLocaleString(undefined, { minimumFractionDigits: 2 })} $
             </div>
           </div>
-          <div className="stat-card">
-            <div style={{ fontSize: '11px', color: '#888', fontWeight: '600', marginBottom: '8px', textTransform: 'uppercase' }}>{t.totalLabel}</div>
-            <div style={{ fontSize: '20px', fontWeight: '800', color: '#1a1a1a' }}>
+          <div className={homeStyles.statCard}>
+            <div className={homeStyles.statLabel}>{t.totalLabel}</div>
+            <div className={homeStyles.statValue}>
               {totalValue.toLocaleString(undefined, { minimumFractionDigits: 2 })} $
             </div>
           </div>
-          <div className="stat-card">
-            <div style={{ fontSize: '11px', color: '#888', fontWeight: '600', marginBottom: '8px', textTransform: 'uppercase' }}>{t.profitLabel}</div>
-            <div style={{ fontSize: '20px', fontWeight: '800', color: isPositive ? '#2ecc71' : '#e74c3c' }}>
+          <div className={homeStyles.statCard}>
+            <div className={homeStyles.statLabel}>{t.profitLabel}</div>
+            <div className={homeStyles.statValue} style={{ color: isPositive ? '#2ecc71' : '#e74c3c' }}>
               {isPositive ? '+' : ''}{profit.toLocaleString(undefined, { minimumFractionDigits: 2 })} $
             </div>
             <div style={{ fontSize: '12px', color: isPositive ? '#2ecc71' : '#e74c3c', marginTop: '2px' }}>
@@ -275,9 +168,8 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Portfolio + Transactions */}
-        <div className="dashboard-grid">
-          <div className="panel">
+        <div className={homeStyles.dashboardGrid}>
+          <div className={homeStyles.panel}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
               <h3 style={{ fontSize: '15px', fontWeight: '800', margin: 0 }}>{t.portfolioTitle}</h3>
               <button
@@ -300,7 +192,7 @@ export default function Home() {
                 const lineProfit = avgPrice > 0 ? ((currentPrice - avgPrice) / avgPrice) * 100 : 0;
                 const linePos = lineProfit >= 0;
                 return (
-                  <div key={i} className="asset-row">
+                  <div key={i} className={homeStyles.assetRow}>
                     <div>
                       <div style={{ fontWeight: '700', fontSize: '14px' }}>{line.symbol}</div>
                       <div style={{ fontSize: '12px', color: '#888' }}>{line.quantity} {t.quantity} × {currentPrice.toFixed(2)} $</div>
@@ -317,13 +209,13 @@ export default function Home() {
             )}
           </div>
 
-          <div className="panel">
+          <div className={homeStyles.panel}>
             <h3 style={{ fontSize: '15px', fontWeight: '800', margin: '0 0 20px 0' }}>{t.transactions}</h3>
             {recentTx.length === 0 ? (
               <p style={{ color: '#888', fontSize: '14px', textAlign: 'center', padding: '20px 0' }}>{t.noTx}</p>
             ) : (
               recentTx.map((tx: any, i: number) => (
-                <div key={i} className="tx-row">
+                <div key={i} className={homeStyles.txRow}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                     <span style={{
                       backgroundColor: tx.isSellOrder ? '#fceae9' : '#e6f9f1',
@@ -350,6 +242,22 @@ export default function Home() {
               ))
             )}
           </div>
+        </div>
+
+        {/* ── RÈGLES DU JEU ── */}
+        <div className={homeStyles.sectionHeader} style={{ marginTop: '50px' }}>
+          <h2 className={homeStyles.sectionTitle}>{t.rulesTitle}</h2>
+          <p className={homeStyles.sectionSub}>{t.rulesSub}</p>
+        </div>
+        
+        <div className={homeStyles.rulesGrid}>
+          {t.rules.map((rule, index) => (
+            <div key={index} className={homeStyles.ruleCard}>
+              <div style={{ fontSize: '26px' }}>{rule.icon}</div>
+              <div style={{ fontSize: '14px', fontWeight: '700', color: '#1a1a1a' }}>{rule.title}</div>
+              <div style={{ fontSize: '12px', color: '#666', lineHeight: '1.6' }}>{rule.desc}</div>
+            </div>
+          ))}
         </div>
       </main>
     </>
