@@ -45,7 +45,9 @@ const handleLoginISEP = () => {
 
   return (
     <>
-      <Head><title>InvestDays - Connexion</title></Head>
+      <Head><title>InvestDays - Connexion</title>
+      <link rel="icon" href="/favicon3.ico" />
+      </Head>
 
       <div className={styles.page}>
 
