@@ -138,6 +138,24 @@ const steps_fr = [
   description: "Prêt à investir ? Cliquez ici pour ouvrir le formulaire d'achat et valider votre transaction.",
   position: "bottom-left",
 },
+{
+  target: "tour-ranks-info",
+  title: "🏆 Le Panthéon",
+  description: "Découvrez qui sont les meilleurs investisseurs de la plateforme en temps réel.",
+  position: "bottom",
+},
+{
+  target: "tour-ranks-performance",
+  title: "🥇 Votre position",
+  description: "Retrouvez votre rang mondial, votre capital total et votre progression par rapport aux 10 000 $ de départ.",
+  position: "bottom",
+},
+{
+  target: "tour-ranks-table",
+  title: "👥 Top Investisseurs",
+  description: "Le classement est mis à jour en direct. Battez-vous pour atteindre le top du tableau !",
+  position: "top",
+},
 ];
 
 
@@ -282,6 +300,24 @@ const steps_en = [
   description: "Prêt à investir ? Cliquez ici pour ouvrir le formulaire d'achat et valider votre transaction.",
   position: "bottom-left",
 },
+{
+  target: "tour-ranks-info",
+  title: "🏆 Le Panthéon",
+  description: "Découvrez qui sont les meilleurs investisseurs de la plateforme en temps réel.",
+  position: "bottom",
+},
+{
+  target: "tour-ranks-performance",
+  title: "🥇 Votre position",
+  description: "Retrouvez votre rang mondial, votre capital total et votre progression par rapport aux 10 000 $ de départ.",
+  position: "bottom",
+},
+{
+  target: "tour-ranks-table",
+  title: "👥 Top Investisseurs",
+  description: "Le classement est mis à jour en direct. Battez-vous pour atteindre le top du tableau !",
+  position: "top",
+},
 ];
 
 export default function TourGuide({ lang = "fr" }) {
@@ -350,20 +386,24 @@ function updatePositions() {
 function next() {
   const currentStep = steps[step];
 
-  // Transition Accueil -> Portefeuille
+  // Accueil -> Portefeuille
   if (currentStep.target === "tour-rules") {
     router.push("/wallet");
   }
 
-  // Transition Portefeuille -> Marchés
+  // Portefeuille -> Marchés
   if (currentStep.target === "tour-wallet-table") {
     router.push("/market");
   }
 
-  // Transition Marchés -> Détail Action
-  // On simule l'ouverture d'une action (AAPL) pour continuer le guide
+  // Marchés -> Détail (AAPL)
   if (currentStep.target === "tour-market-list") {
     router.push("/market/AAPL?market=stocks&name=Apple%20Inc.");
+  }
+
+  // Détail -> Classement (Nouvelle transition)
+  if (currentStep.target === "tour-detail-buy") {
+    router.push("/ranks");
   }
 
   if (step < steps.length - 1) {
@@ -376,17 +416,22 @@ function next() {
 function prev() {
   const currentStep = steps[step];
 
-  // Retour Détail -> Marchés
+  // Classement -> Détail (AAPL)
+  if (currentStep.target === "tour-ranks-info") {
+    router.push("/market/AAPL?market=stocks&name=Apple%20Inc.");
+  }
+
+  // Détail -> Marchés
   if (currentStep.target === "tour-detail-info") {
     router.push("/market");
   }
 
-  // Retour Marchés -> Portefeuille
+  // Marchés -> Portefeuille
   if (currentStep.target === "tour-market-info") {
     router.push("/wallet");
   }
 
-  // Retour Portefeuille -> Accueil
+  // Portefeuille -> Accueil
   if (currentStep.target === "tour-wallet-stats") {
     router.push("/");
   }
@@ -395,7 +440,6 @@ function prev() {
     setStep((s) => s - 1);
   }
 }
-
 
   function finish() {
     localStorage.setItem(TOUR_KEY, "true");

@@ -84,6 +84,7 @@ export default function Ranks() {
       </Head>
       <main className={homeStyles.pageContainer}>
         <div
+          id="tour-ranks-info"
           className={homeStyles.marketHeader}
           style={{ marginBottom: "30px" }}
         >
@@ -94,7 +95,7 @@ export default function Ranks() {
           <div className={homeStyles.rankIconBadge}>🏆</div>
         </div>
 
-        <div className={homeStyles.performanceCard}>
+        <div id="tour-ranks-performance" className={homeStyles.performanceCard}>
           <div className={homeStyles.perfHeader}>
             <span className={homeStyles.perfTitle}>{t.perfTitle}</span>
             <span className={homeStyles.rankBadge}>
@@ -134,6 +135,7 @@ export default function Ranks() {
         </div>
 
         <div
+          id="tour-ranks-table"
           className={homeStyles.assetCard}
           style={{ marginTop: "40px", padding: "30px", backgroundColor: "#fff" }}
         >
