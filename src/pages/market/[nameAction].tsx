@@ -143,7 +143,7 @@ export default function DetailAction(req: Request) {
 
       <main className={homeStyles.pageContainer}>
         <div className={homeStyles.marketHeader}>
-          <div>
+          <div id="tour-detail-info">
             <h1 className={homeStyles.marketTitle}>{nameAction as string}</h1>
             <p className={homeStyles.marketSub}>
               {(name as string) || detail?.name || nameAction} • {
@@ -182,7 +182,7 @@ export default function DetailAction(req: Request) {
                 </span>
               </div>
             </div>
-            <button className={homeStyles.buyButton} style={{ width: '160px', padding: '14px' }} onClick={() => setIsOpen(true)}>
+            <button id="tour-detail-buy" className={homeStyles.buyButton} style={{ width: '160px', padding: '14px' }} onClick={() => setIsOpen(true)}>
               {t.buyBtn}
             </button>
           </div>
@@ -190,7 +190,7 @@ export default function DetailAction(req: Request) {
 
         <div className={homeStyles.assetCard} style={{ minHeight: '600px' }}>
           
-          <div className={homeStyles.filterBar} style={{ marginBottom: '25px', gap: '10px' }}>
+          <div id="tour-detail-chart-type" className={homeStyles.filterBar} style={{ marginBottom: '25px', gap: '10px' }}>
             <button 
               onClick={() => setChartType("line")} 
               style={toggleBtnStyle(chartType === "line")}
@@ -204,7 +204,7 @@ export default function DetailAction(req: Request) {
               🕯️ {t.candle}
             </button>
           </div>
-
+          <div id="tour-detail-chart-container">
           {loadingChart ? (
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '450px', color: '#888' }}>
               {t.loading}
@@ -252,6 +252,7 @@ export default function DetailAction(req: Request) {
               <p style={{ color: '#e74c3c', fontWeight: '800' }}>{t.noData}</p>
             </div>
           )}
+        </div>
         </div>
 
         <Popup 

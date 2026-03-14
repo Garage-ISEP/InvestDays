@@ -113,6 +113,31 @@ const steps_fr = [
   description: "Cliquez sur une ligne pour voir les détails de l'actif et passer votre premier ordre !",
   position: "top",
 },
+
+{
+  target: "tour-detail-info",
+  title: "📊 Analyse précise",
+  description: "Ici vous voyez le prix en temps réel et les variations de l'actif sélectionné.",
+  position: "bottom",
+},
+{
+  target: "tour-detail-chart-type",
+  title: "🕯️ Vue personnalisée",
+  description: "Basculez entre une courbe simple ou des bougies japonaises pour une analyse plus technique.",
+  position: "bottom",
+},
+{
+  target: "tour-detail-chart-container",
+  title: "📈 Historique",
+  description: "Utilisez les boutons (1m, 3m, Tout) pour changer la période de temps affichée.",
+  position: "top",
+},
+{
+  target: "tour-detail-buy",
+  title: "🎯 Passer un ordre",
+  description: "Prêt à investir ? Cliquez ici pour ouvrir le formulaire d'achat et valider votre transaction.",
+  position: "bottom-left",
+},
 ];
 
 
@@ -204,6 +229,9 @@ const steps_en = [
 
 
 
+
+
+
   {
   target: "tour-market-info",
   title: "🚀 Explorez les marchés",
@@ -227,6 +255,32 @@ const steps_en = [
   title: "📊 Liste des actifs",
   description: "Cliquez sur une ligne pour voir les détails de l'actif et passer votre premier ordre !",
   position: "top",
+},
+
+
+{
+  target: "tour-detail-info",
+  title: "📊 Analyse précise",
+  description: "Ici vous voyez le prix en temps réel et les variations de l'actif sélectionné.",
+  position: "bottom",
+},
+{
+  target: "tour-detail-chart-type",
+  title: "🕯️ Vue personnalisée",
+  description: "Basculez entre une courbe simple ou des bougies japonaises pour une analyse plus technique.",
+  position: "bottom",
+},
+{
+  target: "tour-detail-chart-container",
+  title: "📈 Historique",
+  description: "Utilisez les boutons (1m, 3m, Tout) pour changer la période de temps affichée.",
+  position: "top",
+},
+{
+  target: "tour-detail-buy",
+  title: "🎯 Passer un ordre",
+  description: "Prêt à investir ? Cliquez ici pour ouvrir le formulaire d'achat et valider votre transaction.",
+  position: "bottom-left",
 },
 ];
 
@@ -295,12 +349,21 @@ function updatePositions() {
 }
 function next() {
   const currentStep = steps[step];
+
+  // Transition Accueil -> Portefeuille
   if (currentStep.target === "tour-rules") {
     router.push("/wallet");
   }
 
+  // Transition Portefeuille -> Marchés
   if (currentStep.target === "tour-wallet-table") {
     router.push("/market");
+  }
+
+  // Transition Marchés -> Détail Action
+  // On simule l'ouverture d'une action (AAPL) pour continuer le guide
+  if (currentStep.target === "tour-market-list") {
+    router.push("/market/AAPL?market=stocks&name=Apple%20Inc.");
   }
 
   if (step < steps.length - 1) {
@@ -313,10 +376,17 @@ function next() {
 function prev() {
   const currentStep = steps[step];
 
+  // Retour Détail -> Marchés
+  if (currentStep.target === "tour-detail-info") {
+    router.push("/market");
+  }
+
+  // Retour Marchés -> Portefeuille
   if (currentStep.target === "tour-market-info") {
     router.push("/wallet");
   }
 
+  // Retour Portefeuille -> Accueil
   if (currentStep.target === "tour-wallet-stats") {
     router.push("/");
   }
