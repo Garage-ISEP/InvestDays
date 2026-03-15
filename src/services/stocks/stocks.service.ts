@@ -113,13 +113,25 @@ async function getRecentPrices(symbol: string, range: TimeRange = "1M", userId: 
   } catch (e) { return { results: [] }; }
 }
 
+async function getDetailsStock(symbol: string, userId?: string | number, ip?: string) {
+  return { results: { name: symbol.toUpperCase(), branding: { logo_url: null } } };
+}
+
+async function getPreviousClose(symbol: string, userId?: number, ip?: string) {
+    const res = await getLastPrice(symbol, 0, "");
+    return res.results?.[0]?.price || null;
+}
+
+async function getLogoStock(url?: string, userId?: string | number, ip?: string) {
+  return "";
+}
+
 const stocksService = { 
   search, 
   getRecentPrices, 
   getLastPrice, 
-  getDetailsStock: async (s: string) => ({ results: { name: s.toUpperCase() } }), 
-  getLogoStock: async () => "", 
-  getPreviousClose: async () => null 
+  getDetailsStock, 
+  getLogoStock,
+  getPreviousClose
 };
-
 export default stocksService;
