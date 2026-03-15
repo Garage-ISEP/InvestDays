@@ -93,54 +93,53 @@ export default function TourGuide() {
     setShowLangSelector(false); 
   }
 
-  function updatePositions() {
-    const current = steps[step];
-    const el = document.getElementById(current.target);
-    
-    if (!el) {
-      setTimeout(updatePositions, 200);
-      return;
+function updatePositions() {
+  const current = steps[step];
+  const el = document.getElementById(current.target);
+  
+  if (!el) {
+    setTimeout(updatePositions, 50); 
+    return;
+  }
+  el.scrollIntoView({ behavior: "auto", block: "center" });
+  
+  requestAnimationFrame(() => {
+    const rect = el.getBoundingClientRect();
+    const pad = 8;
+
+    setSpotlight({
+      top: Math.max(0, rect.top - pad),
+      left: rect.left - pad,
+      width: rect.width + pad * 2,
+      height: rect.height + pad * 2,
+    });
+
+    let tooltipTop;
+    const TOOLTIP_HEIGHT = 180; 
+
+    if (current.position === "top") {
+      tooltipTop = rect.top - TOOLTIP_HEIGHT - 20;
+    } else {
+      tooltipTop = rect.bottom + 16;
     }
 
-    el.scrollIntoView({ behavior: "smooth", block: "center" });
-    
-    setTimeout(() => {
-      const rect = el.getBoundingClientRect();
-      const pad = 8;
+    if (tooltipTop + TOOLTIP_HEIGHT > window.innerHeight) {
+      tooltipTop = window.innerHeight - TOOLTIP_HEIGHT - 20;
+    }
 
-      setSpotlight({
-        top: Math.max(0, rect.top - pad),
-        left: rect.left - pad,
-        width: rect.width + pad * 2,
-        height: rect.height + pad * 2,
-      });
+    tooltipTop = Math.max(90, tooltipTop);
 
-      let tooltipTop;
-      const TOOLTIP_HEIGHT = 180; 
+    let tooltipLeft;
+    if (current.position === "bottom-left") {
+      tooltipLeft = rect.right - TOOLTIP_WIDTH;
+    } else {
+      tooltipLeft = rect.left + rect.width / 2 - TOOLTIP_WIDTH / 2;
+    }
+    tooltipLeft = Math.max(16, Math.min(tooltipLeft, window.innerWidth - TOOLTIP_WIDTH - 16));
 
-      if (current.position === "top") {
-        tooltipTop = rect.top - TOOLTIP_HEIGHT - 20;
-      } else {
-        tooltipTop = rect.bottom + 16;
-      }
-
-      if (tooltipTop + TOOLTIP_HEIGHT > window.innerHeight) {
-        tooltipTop = window.innerHeight - TOOLTIP_HEIGHT - 20;
-      }
-
-      tooltipTop = Math.max(90, tooltipTop);
-
-      let tooltipLeft;
-      if (current.position === "bottom-left") {
-        tooltipLeft = rect.right - TOOLTIP_WIDTH;
-      } else {
-        tooltipLeft = rect.left + rect.width / 2 - TOOLTIP_WIDTH / 2;
-      }
-      tooltipLeft = Math.max(16, Math.min(tooltipLeft, window.innerWidth - TOOLTIP_WIDTH - 16));
-
-      setTooltip({ top: tooltipTop, left: tooltipLeft });
-    }, 500); 
-  }
+    setTooltip({ top: tooltipTop, left: tooltipLeft });
+  }); 
+}
 
   function next() {
     const currentStep = steps[step];
@@ -218,7 +217,7 @@ export default function TourGuide() {
         <div style={{
           position: "absolute", top: spotlight.top, left: spotlight.left, width: spotlight.width, height: spotlight.height,
           borderRadius: 10, border: "2px solid #f3ca3e", boxShadow: "0 0 0 4px rgba(243,202,62,0.2)",
-          pointerEvents: "none", transition: "all 0.3s ease",
+          pointerEvents: "none", transition: "all 0.15s ease",
         }} />
       </div>
 
