@@ -47,34 +47,48 @@ export default function Ranks() {
       .catch((err) => console.error("Erreur API:", err));
   }, []);
 
-  const myPerformance = useMemo(() => {
-    if (!dataRanks || !user || !Array.isArray(dataRanks)) return null;
+const myPerformance = useMemo(() => {
+  if (!dataRanks || !user || !Array.isArray(dataRanks)) return null;
 
-    const sortedData = [...dataRanks]
-      .filter((item: any) => item?.user?.isAdmin === false)
-      .sort(
-        (a: any, b: any) =>
-          (Number(b.publicWalletValue) || 0) -
-          (Number(a.publicWalletValue) || 0)
-      );
+  const playersOnly = dataRanks.filter((item: any) => item?.user?.isAdmin === false);
 
-    const myIndex = sortedData.findIndex(
-      (item: any) => item?.user?.id === (user as any)?.id
-    );
+  const bestWalletsPerUser = playersOnly.reduce((acc: any[], current: any) => {
+    const userId = current.user?.id;
+    const existingEntryIndex = acc.findIndex(item => item.user?.id === userId);
 
-    if (myIndex === -1) return null;
+    if (existingEntryIndex === -1) {
+      acc.push(current);
+    } else {
+      if (Number(current.publicWalletValue) > Number(acc[existingEntryIndex].publicWalletValue)) {
+        acc[existingEntryIndex] = current;
+      }
+    }
+    return acc;
+  }, []);
 
-    const myData = sortedData[myIndex];
-    const STARTING_CASH = 10000;
-    const totalValue = Number(myData.publicWalletValue) || 0;
+  const sortedData = [...bestWalletsPerUser].sort(
+    (a: any, b: any) =>
+      (Number(b.publicWalletValue) || 0) -
+      (Number(a.publicWalletValue) || 0)
+  );
 
-    return {
-      rank: myIndex + 1,
-      total: totalValue,
-      profit: totalValue - STARTING_CASH,
-      percent: ((totalValue - STARTING_CASH) / STARTING_CASH) * 100,
-    };
-  }, [dataRanks, user]);
+  const myIndex = sortedData.findIndex(
+    (item: any) => item?.user?.id === (user as any)?.id
+  );
+
+  if (myIndex === -1) return null;
+
+  const myData = sortedData[myIndex];
+  const STARTING_CASH = 10000;
+  const totalValue = Number(myData.publicWalletValue) || 0;
+
+  return {
+    rank: myIndex + 1,
+    total: totalValue,
+    profit: totalValue - STARTING_CASH,
+    percent: ((totalValue - STARTING_CASH) / STARTING_CASH) * 100,
+  };
+}, [dataRanks, user]);
 
   return (
     <>
