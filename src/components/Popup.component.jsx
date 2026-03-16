@@ -12,13 +12,15 @@ function Popup({
   maxCount = 10000,
   open,
   close,
-  lang // Ajout de la prop lang passée par le parent
+  lang 
 }) {
   const { wallets, selectedId } = useWallet();
   const [count, setCount] = useState(0);
   const fetch = useFetch();
+const isBTC = symbol?.toUpperCase() === "BTCUSD";
+const step = isBTC ? 0.001 : 0.1;
+const precision = isBTC ? 3 : 1;
 
-  // Traductions internes de la modale
   const translations = {
     fr: {
       btnBuy: "Acheter",
@@ -37,43 +39,41 @@ function Popup({
       errOrder: "Error during the order"
     }
   };
-
-  // Sélection de la langue sans assertion de type pour éviter l'erreur ts(8016)
   const t = translations[lang] || translations.fr;
 
   useEffect(() => {
     setCount(0);
   }, [open, symbol]);
 
-  const increment = () => {
-    setCount(prev => {
-      const nextVal = (Number(prev) + 0.1);
-      return nextVal >= maxCount ? maxCount.toFixed(1) : nextVal.toFixed(1);
-    });
-  };
+const increment = () => {
+  setCount(prev => {
+    const nextVal = Number(prev) + step;
+    if (nextVal >= maxCount) return Number(maxCount).toFixed(precision);
+    return nextVal.toFixed(precision);
+  });
+};
 
-  const decrement = () => {
-    setCount(prev => {
-      const nextVal = (Number(prev) - 0.1);
-      return nextVal <= 0 ? (0).toFixed(1) : nextVal.toFixed(1);
-    });
-  };
+const decrement = () => {
+  setCount(prev => {
+    const nextVal = Number(prev) - step;
+    if (nextVal <= 0) return (0).toFixed(precision);
+    return nextVal.toFixed(precision);
+  });
+};
 
-  const handleChange = (e) => {
-    const val = e.target.value;
-    if (val === "") {
-      setCount("");
-      return;
-    }
-    const num = Number(val);
-    if (isNaN(num)) return;
-    if (num > maxCount) {
-      setCount(maxCount);
-    } else {
-      setCount(val);
-    }
-  };
+const handleChange = (e) => {
+  const val = e.target.value;
+  if (val === "") { setCount(""); return; }
 
+  const num = parseFloat(val);
+  if (isNaN(num)) return;
+
+  if (num > maxCount) {
+    setCount(Number(maxCount).toFixed(precision));
+  } else {
+    setCount(val); 
+  }
+};
   const executeOrder = () => {
     let quantity = Number(count);
     if (quantity <= 0) {
@@ -87,7 +87,7 @@ function Popup({
     const payload = {
       walletId: wallets[selectedId].id,
       symbol: symbol,
-      amount: quantity.toFixed(1),
+      amount: quantity.toFixed(precision),
       selling: sell ? "true" : "false",
     };
     
@@ -124,17 +124,21 @@ function Popup({
             </button>
             <input 
               type="number" 
-              step="0.1" 
+              step={step}
+              max={maxCount}
               value={count} 
               onChange={handleChange} 
-              onBlur={() => setCount(Number(count).toFixed(1))}
+              onBlur={() => {
+                let n = Number(count);
+                if (n > maxCount) n = maxCount;
+                if (n < 0) n = 0;
+                setCount(n.toFixed(precision));
+              }}
             />
             <button className={PopupStyles.increase} onClick={increment}>
               +
             </button>
           </div>
-
-          {/* Bouton d'action traduit dynamiquement */}
           <button
             className={PopupStyles.buttonBuy}
             onClick={executeOrder}
@@ -144,7 +148,6 @@ function Popup({
         </div>
 
         <div className={PopupStyles.modalFooter}>
-          {/* Bouton fermer traduit */}
           <button className={PopupStyles.closeLink} onClick={close}>
             {t.btnClose}
           </button>
