@@ -1,6 +1,4 @@
-/* ─────────────────────────────────────────
-   PAGE WRAPPER
-───────────────────────────────────────── */
+/* ── PAGE ── */
 .page {
   min-height: 100vh;
   display: flex;
@@ -12,32 +10,62 @@
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
-/* Cercles décoratifs en arrière-plan */
 .bgCircle1 {
   position: absolute;
-  width: 500px;
-  height: 500px;
+  width: 600px;
+  height: 600px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(243, 202, 62, 0.15) 0%, transparent 70%);
-  top: -150px;
-  right: -150px;
+  background: radial-gradient(circle, rgba(243,202,62,0.18) 0%, transparent 70%);
+  top: -200px;
+  right: -200px;
   pointer-events: none;
 }
 
 .bgCircle2 {
   position: absolute;
-  width: 350px;
-  height: 350px;
+  width: 400px;
+  height: 400px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(243, 202, 62, 0.10) 0%, transparent 70%);
-  bottom: -100px;
-  left: -100px;
+  background: radial-gradient(circle, rgba(243,202,62,0.12) 0%, transparent 70%);
+  bottom: -120px;
+  left: -120px;
   pointer-events: none;
 }
 
-/* ─────────────────────────────────────────
-   CENTRAGE
-───────────────────────────────────────── */
+.bgGrid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(243,202,62,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(243,202,62,0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+}
+
+/* ── LANGUE ── */
+.langToggle {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 100;
+  padding: 8px 16px;
+  border-radius: 12px;
+  border: none;
+  background: #f3ca3e;
+  color: #1a1a1a;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.langToggle:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+}
+
+/* ── WRAPPER ── */
 .wrapper {
   display: flex;
   flex-direction: column;
@@ -48,48 +76,48 @@
 }
 
 @keyframes fadeUp {
-  from { opacity: 0; transform: translateY(20px); }
+  from { opacity: 0; transform: translateY(24px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ─────────────────────────────────────────
-   LOGO
-───────────────────────────────────────── */
+/* ── LOGO ── */
 .logoWrap {
-  margin-bottom: -20px;
+  margin-bottom: -24px;
   z-index: 2;
-  filter: drop-shadow(0 8px 20px rgba(243, 202, 62, 0.35));
+  filter: drop-shadow(0 8px 24px rgba(243,202,62,0.4));
 }
 
-/* ─────────────────────────────────────────
-   CARTE
-───────────────────────────────────────── */
+/* ── CARTE ── */
 .card {
-  width: 360px;
+  width: 380px;
   background: #ffffff;
   border-radius: 24px;
   box-shadow:
-    0 4px 6px rgba(0, 0, 0, 0.04),
-    0 20px 60px rgba(0, 0, 0, 0.08);
+    0 4px 6px rgba(0,0,0,0.04),
+    0 20px 60px rgba(0,0,0,0.09);
   overflow: hidden;
 }
 
 .cardTop {
-  padding: 48px 36px 28px;
+  padding: 52px 36px 24px;
   text-align: center;
 }
 
 .appName {
-  font-size: 1.75rem;
+  font-size: 1.9rem;
   font-weight: 800;
   color: #1a1a1a;
   letter-spacing: -0.5px;
-  margin: 0 0 8px;
+  margin: 0 0 6px;
+}
+
+.accent {
+  color: #c9a200;
 }
 
 .tagline {
-  font-size: 0.85rem;
-  color: #999;
+  font-size: 0.82rem;
+  color: #bbb;
   margin: 0;
   letter-spacing: 0.3px;
 }
@@ -97,17 +125,32 @@
 .divider {
   height: 1px;
   background: #f0f0f0;
-  margin: 0 36px;
+  margin: 0 32px;
 }
 
 .cardBottom {
-  padding: 28px 36px 36px;
+  padding: 28px 32px 36px;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 16px;
+  gap: 12px;
 }
 
+/* ── OPTIONS ── */
+.optionBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.optionHint {
+  font-size: 0.75rem;
+  color: #bbb;
+  margin: 0;
+  text-align: center;
+  letter-spacing: 0.2px;
+}
+
+/* compat ancien .hint */
 .hint {
   font-size: 0.8rem;
   color: #bbb;
@@ -116,9 +159,65 @@
   letter-spacing: 0.2px;
 }
 
-/* ─────────────────────────────────────────
-   BOUTON
-───────────────────────────────────────── */
+/* ── SÉPARATEUR ── */
+.separator {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 4px 0;
+}
+
+.separator::before,
+.separator::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: #f0f0f0;
+}
+
+.separator span {
+  font-size: 0.75rem;
+  color: #ccc;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* ── BOUTONS ── */
+.isepBtn {
+  width: 100%;
+  height: 50px;
+  background: #f3ca3e;
+  color: #1a1a1a;
+  border: none;
+  border-radius: 14px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+  box-shadow: 0 4px 15px rgba(243,202,62,0.4);
+}
+
+.isepBtn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(243,202,62,0.5);
+  background: #f0c228;
+}
+
+.isepBtn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.isepBtn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* compat ancien .loginBtn */
 .loginBtn {
   width: 100%;
   height: 50px;
@@ -133,19 +232,14 @@
   align-items: center;
   justify-content: center;
   gap: 10px;
-  letter-spacing: 0.2px;
   transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
-  box-shadow: 0 4px 15px rgba(243, 202, 62, 0.4);
+  box-shadow: 0 4px 15px rgba(243,202,62,0.4);
 }
 
 .loginBtn:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(243, 202, 62, 0.5);
+  box-shadow: 0 8px 25px rgba(243,202,62,0.5);
   background: #f0c228;
-}
-
-.loginBtn:active:not(:disabled) {
-  transform: translateY(0);
 }
 
 .loginBtn:disabled {
@@ -153,7 +247,109 @@
   cursor: not-allowed;
 }
 
-/* Spinner chargement */
+.demoBtn {
+  width: 100%;
+  height: 50px;
+  background: transparent;
+  color: #555;
+  border: 2px solid #e8e8e8;
+  border-radius: 14px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: all 0.15s ease;
+}
+
+.demoBtn:hover {
+  border-color: #f3ca3e;
+  color: #1a1a1a;
+  background: #fffdf0;
+  transform: translateY(-1px);
+}
+
+.backBtn {
+  background: none;
+  border: none;
+  color: #aaa;
+  font-size: 0.82rem;
+  cursor: pointer;
+  padding: 4px 0;
+  text-align: center;
+  transition: color 0.15s;
+}
+
+.backBtn:hover {
+  color: #555;
+}
+
+/* ── FORMULAIRE ── */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.inputWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.inputIcon {
+  position: absolute;
+  left: 14px;
+  color: #ccc;
+  pointer-events: none;
+  flex-shrink: 0;
+}
+
+.input {
+  width: 100%;
+  height: 48px;
+  padding: 0 44px 0 42px;
+  border: 1.5px solid #e8e8e8;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  color: #1a1a1a;
+  background: #fafafa;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  box-sizing: border-box;
+}
+
+.input:focus {
+  border-color: #f3ca3e;
+  box-shadow: 0 0 0 3px rgba(243,202,62,0.15);
+  background: #fff;
+}
+
+.input::placeholder {
+  color: #ccc;
+}
+
+.eyeBtn {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 0;
+  line-height: 1;
+  opacity: 0.6;
+  transition: opacity 0.15s;
+}
+
+.eyeBtn:hover {
+  opacity: 1;
+}
+
+/* ── SPINNER ── */
 .spinner {
   width: 18px;
   height: 18px;
@@ -161,36 +357,68 @@
   border-top-color: #1a1a1a;
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
+  display: inline-block;
 }
 
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
 
-/* ─────────────────────────────────────────
-   ERREUR
-───────────────────────────────────────── */
+/* ── ERREUR ── */
 .error {
   color: #e74c3c;
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   margin: 0;
   text-align: center;
   font-style: italic;
 }
 
-/* ─────────────────────────────────────────
-   FOOTER
-───────────────────────────────────────── */
-.footer {
+/* ── FOOTER ── */
+.footerRow {
   margin-top: 24px;
-  font-size: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.finageLink {
+  display: flex;
+  align-items: center;
+}
+
+.footer {
+  font-size: 0.72rem;
   color: #ccc;
+  margin: 0;
   text-align: center;
 }
 
-/* ─────────────────────────────────────────
-   RESPONSIVE
-───────────────────────────────────────── */
+/* ── TOAST ── */
+.customToast {
+  background-color: #fff !important;
+  color: #1a1a1a !important;
+  border: 2px solid #f3ca3e !important;
+  border-radius: 12px !important;
+  font-weight: 600 !important;
+  box-shadow: 0 4px 15px rgba(243,202,62,0.2) !important;
+}
+
+.customToast :global(.Toastify__toast-icon svg) {
+  fill: #f3ca3e !important;
+}
+
+.customProgress {
+  background: #f3ca3e !important;
+  height: 4px !important;
+}
+
+.customToast :global(.Toastify__toast-body) {
+  font-family: inherit;
+  font-size: 0.95rem;
+}
+
+/* ── RESPONSIVE ── */
 @media (max-width: 480px) {
   .card {
     width: calc(100vw - 40px);
@@ -198,49 +426,17 @@
   }
 
   .cardTop {
-    padding: 40px 28px 24px;
+    padding: 44px 24px 20px;
   }
 
   .cardBottom {
-    padding: 24px 28px 32px;
+    padding: 24px 24px 32px;
   }
 
   .divider {
-    margin: 0 28px;
+    margin: 0 24px;
   }
 
-  .bgCircle1 {
-    width: 300px;
-    height: 300px;
-  }
-
-  .bgCircle2 {
-    width: 200px;
-    height: 200px;
-  }
-}
-
-
-
-.customToast {
-  background-color: var(--quatrieme) !important; 
-  color: var(--clrSelected) !important;         
-  border: 2px solid var(--premier) !important;  
-  border-radius: 12px !important;
-  font-weight: 600 !important;
-  box-shadow: 0 4px 15px rgba(243, 202, 62, 0.2) !important;
-}
-
-.customToast :global(.Toastify__toast-icon svg) {
-  fill: var(--premier) !important;
-}
-
-.customProgress {
-  background: var(--premier) !important; 
-  height: 4px !important;
-}
-
-.customToast :global(.Toastify__toast-body) {
-  font-family: inherit;
-  font-size: 0.95rem;
+  .bgCircle1 { width: 300px; height: 300px; }
+  .bgCircle2 { width: 200px; height: 200px; }
 }
