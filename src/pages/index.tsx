@@ -98,6 +98,8 @@ export default function Home() {
   const profitPercent = ((profit / STARTING_CASH) * 100).toFixed(2);
   const isPositive = profit >= 0;
 
+  const currencyFormat = { minimumFractionDigits: 2, maximumFractionDigits: 2 };
+
   const lines = walletsLines?.[selectedId]
     ? Object.values(walletsLines[selectedId]) as any[]
     : [];
@@ -142,25 +144,25 @@ export default function Home() {
           <div className={homeStyles.statCard}>
             <div className={homeStyles.statLabel}>{t.cashLabel}</div>
             <div className={homeStyles.statValue}>
-              {cash.toLocaleString(undefined, { minimumFractionDigits: 2 })} $
+              {cash.toLocaleString(undefined, currencyFormat)} $
             </div>
           </div>
           <div className={homeStyles.statCard}>
             <div className={homeStyles.statLabel}>{t.assetsLabel}</div>
             <div className={homeStyles.statValue}>
-              {assetsCached.toLocaleString(undefined, { minimumFractionDigits: 2 })} $
+              {assetsCached.toLocaleString(undefined, currencyFormat)} $
             </div>
           </div>
           <div className={homeStyles.statCard}>
             <div className={homeStyles.statLabel}>{t.totalLabel}</div>
             <div className={homeStyles.statValue}>
-              {totalValue.toLocaleString(undefined, { minimumFractionDigits: 2 })} $
+              {totalValue.toLocaleString(undefined, currencyFormat)} $
             </div>
           </div>
           <div className={homeStyles.statCard}>
             <div className={homeStyles.statLabel}>{t.profitLabel}</div>
             <div className={homeStyles.statValue} style={{ color: isPositive ? '#2ecc71' : '#e74c3c' }}>
-              {isPositive ? '+' : ''}{profit.toLocaleString(undefined, { minimumFractionDigits: 2 })} $
+              {isPositive ? '+' : ''}{profit.toLocaleString(undefined, currencyFormat)} $
             </div>
             <div style={{ fontSize: '12px', color: isPositive ? '#2ecc71' : '#e74c3c', marginTop: '2px' }}>
               {isPositive ? '+' : ''}{profitPercent}%
@@ -195,7 +197,9 @@ export default function Home() {
                   <div key={i} className={homeStyles.assetRow}>
                     <div>
                       <div style={{ fontWeight: '700', fontSize: '14px' }}>{line.symbol}</div>
-                      <div style={{ fontSize: '12px', color: '#888' }}>{line.quantity} {t.quantity} × {currentPrice.toFixed(2)} $</div>
+                      <div style={{ fontSize: '12px', color: '#888' }}>
+                        {Number(line.quantity).toFixed(2)} {t.quantity} × {currentPrice.toFixed(2)} $
+                      </div>
                     </div>
                     <div style={{ textAlign: 'right' }}>
                       <div style={{ fontWeight: '700', fontSize: '14px' }}>{lineValue.toFixed(2)} $</div>
@@ -227,7 +231,7 @@ export default function Home() {
                     </span>
                     <div>
                       <div style={{ fontWeight: '700' }}>{tx.symbol}</div>
-                      <div style={{ color: '#888', fontSize: '11px' }}>{tx.quantity} {t.quantity}</div>
+                      <div style={{ color: '#888', fontSize: '11px' }}>{Number(tx.quantity).toFixed(2)} {t.quantity}</div>
                     </div>
                   </div>
                   <div style={{ textAlign: 'right' }}>

@@ -18,8 +18,8 @@ function Popup({
   const [count, setCount] = useState(0);
   const fetch = useFetch();
 const isBTC = symbol?.toUpperCase() === "BTCUSD";
-const step = isBTC ? 0.001 : 0.1;
-const precision = isBTC ? 3 : 1;
+const step = isBTC ? 0.1 : 0.1;
+const precision = isBTC ? 1 : 1;
 
   const translations = {
     fr: {
