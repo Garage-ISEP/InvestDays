@@ -154,32 +154,39 @@ const WalletProvider = ({ children }: { children: any }) => {
 
     return acc;
   }
-  async function getPrice(symbol: string): Promise<number> {
-      try {
-        if (
-          valuesCachedRef.current[symbol] &&
-          valuesCachedRef.current[symbol].date > Date.now() - 10000
-        ) {
-          return valuesCachedRef.current[symbol].value;
-        }
-
-        const response = await fetch.get("/api/stock/lastPrice?symbol=" + symbol);
-        const validPrice = typeof response === 'number' ? response : 0;
-
-        setValuesCached((prev) => {
-          return {
-            ...prev,
-            [symbol]: {
-              value: validPrice,
-              date: Date.now(),
-            },
-          };
-        });
-        return validPrice;
-      } catch (error) {
-        return 0; 
-      }
+async function getPrice(symbol: string): Promise<number> {
+  try {
+    if (
+      valuesCachedRef.current[symbol] &&
+      valuesCachedRef.current[symbol].date > Date.now() - 10000
+    ) {
+      return valuesCachedRef.current[symbol].value;
     }
+
+    const response: any = await fetch.get("/api/stock/lastPrice?symbol=" + symbol);
+    let validPrice = 0;
+    if (typeof response === 'number') {
+      validPrice = response;
+    } else if (response?.results && response.results.length > 0 && response.results[0].price) {
+      validPrice = response.results[0].price; 
+    } else if (response?.price) {
+      validPrice = response.price; 
+    }
+
+    setValuesCached((prev) => {
+      return {
+        ...prev,
+        [symbol]: {
+          value: validPrice,
+          date: Date.now(),
+        },
+      };
+    });
+    return validPrice;
+  } catch (error) {
+    return 0; 
+  }
+}
   async function fillLines(lines: any, walletId: number) {
     lines.forEach((transaction: any) => {
       getPrice(transaction.symbol);

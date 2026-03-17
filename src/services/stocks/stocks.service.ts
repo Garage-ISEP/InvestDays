@@ -73,18 +73,36 @@ async function search(term: string, userId: number, ip: string): Promise<StockAp
 async function getLastPrice(symbol: string, userId: number, ip: string): Promise<any> {
   const type = getAssetType(symbol);
   const endpoint = type === "crypto" ? "crypto" : type === "forex" ? "forex" : "stock";
+  
   const fetcher = async (s: string) => {
     const r = await fetch(`https://api.finage.co.uk/last/${endpoint}/${s.toLowerCase()}?apikey=${FINAGE_API_KEY}`);
     return await r.json();
   };
+  
   try {
     const data = await fetchWithFallback(endpoint, symbol, fetcher, "day", 1);
     const price = data.price || data.p || data.ask || data.bid;
     const status = data.market_status || "open"
     if (price) return { results: [{ price, symbol: symbol.toUpperCase(), market_status: status }] };
   } catch (e) {}
+
+  try {
+    const aggData = await getRecentPrices(symbol, "1D", userId, ip, type);
+    if (aggData?.results && aggData.results.length > 0) {
+      const lastCandle = aggData.results[aggData.results.length - 1]
+      return { 
+        results:[{ 
+          price: lastCandle.c, 
+          symbol: symbol.toUpperCase(), 
+          market_status: "open" 
+        }] 
+      };
+    }
+  } catch (e) {}
+
   return { results: [] };
 }
+
 
 async function getRecentPrices(symbol: string, range: TimeRange = "1M", userId: number, ip: string, marketHint?: string): Promise<any> {
   const now = new Date();

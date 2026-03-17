@@ -6,12 +6,10 @@ import { Status } from "@prisma/client";
 import stockService from "../../../services/stocks/stocks.service";
 import transactionsService from "../../../services/transactions/transactions.service";
 import walletsService from "../../../services/wallets/wallets.service";
-// listen for get request
+
 export default apiHandler(transactionByWallet);
 
 async function transactionByWallet(req: Request, res: NextApiResponse<any>) {
-  //desactivate temporarly this endpoint
-
   if (req.method !== "POST") {
     throw `Method ${req.method} not allowed`;
   }
@@ -44,7 +42,6 @@ async function transactionByWallet(req: Request, res: NextApiResponse<any>) {
       );
   }
 
-  // Get last stock price
   const clientIp = requestIp.getClientIp(req);
 
   if (!clientIp) throw new Error("No client IP found");
@@ -53,12 +50,14 @@ async function transactionByWallet(req: Request, res: NextApiResponse<any>) {
     req.auth.sub,
     clientIp || ""
   );
-  if (summary?.results[0]?.error == "NOT_FOUND") {
+  
+  if (summary?.results[0]?.error == "NOT_FOUND" || !summary?.results?.length) {
     throw "Unknown symbol";
   }
   let stock = summary.results[0];
 
   if (!wallet.id) throw new Error("Wallet not found");
+  
   const transaction = await transactionsService.create(
     selling === "true",
     symbol,
@@ -66,36 +65,31 @@ async function transactionByWallet(req: Request, res: NextApiResponse<any>) {
     wallet.id as number
   );
 
-  if (
-    stock.market_status !== "closed" &&
-    stock.market_status !== "early_trading" &&
-    stock.market_status !== "late_trading"
-  ) {
-    if (selling === "true") {
-      let quantity = 0;
-      wallet.transactions.forEach((transaction: any) => {
-        if (
-          transaction.symbol === symbol &&
-          transaction.status === "EXECUTED"
-        ) {
-          quantity += (transaction.isSellOrder ? -1 : 1) * transaction.quantity;
-        }
-      });
-      if (quantity < parseFloat(amount)) {
-        await transactionsService.updateStatus(transaction.id, Status.FAILED);
-      } else {
-        await transactionsService.executeTransaction(transaction, stock.price);
+  if (selling === "true") {
+    let quantity = 0;
+    wallet.transactions.forEach((transaction: any) => {
+      if (
+        transaction.symbol === symbol &&
+        transaction.status === "EXECUTED"
+      ) {
+        quantity += (transaction.isSellOrder ? -1 : 1) * transaction.quantity;
       }
+    });
+    if (quantity < parseFloat(amount)) {
+      await transactionsService.updateStatus(transaction.id, Status.FAILED);
+      throw "Not enough stocks to sell"; 
     } else {
-      if (wallet.cash < stock.price * parseFloat(amount)) {
-        await transactionsService.updateStatus(transaction.id, Status.FAILED);
-      } else {
-        await transactionsService.executeTransaction(transaction, stock.price);
-      }
+      await transactionsService.executeTransaction(transaction, stock.price);
+    }
+  } else {
+    if (wallet.cash < stock.price * parseFloat(amount)) {
+      await transactionsService.updateStatus(transaction.id, Status.FAILED);
+      throw "Not enough cash to buy"; 
+    } else {
+      await transactionsService.executeTransaction(transaction, stock.price);
     }
   }
 
-  // get new wallet
   const newWallet = await walletsService.find(walletId);
 
   return res.status(200).json(newWallet);
