@@ -6,9 +6,18 @@ export type TimeRange = "1H" | "1D" | "1W" | "1M" | "ALL";
 
 function getAssetType(symbol: string): "crypto" | "forex" | "stock" {
   const s = symbol.toUpperCase();
-  if (s.endsWith("BTC") || s.endsWith("ETH") || s.endsWith("USD") || s.endsWith("USDT") || s.length > 5) return "crypto";
-  const KNOWN_FOREX = ["EURUSD","GBPUSD","USDJPY","USDCHF","AUDUSD","USDCAD","NZDUSD","EURGBP","EURJPY","GBPJPY"];
-  if (KNOWN_FOREX.includes(s)) return "forex";
+  const isForex = s.length === 6 && !s.endsWith("USDT") && !s.includes("BTC") && !s.includes("ETH");
+  
+  const KNOWN_FOREX = ["EURUSD","GBPUSD","USDJPY","USDCHF","AUDUSD","USDCAD","NZDUSD","EURGBP","EURJPY","GBPJPY", "EURDOP"];
+  
+  if (KNOWN_FOREX.includes(s) || isForex) {
+    return "forex";
+  }
+
+  if (s.endsWith("USDT") || s.endsWith("BTC") || s.endsWith("ETH") || s.length > 6) {
+    return "crypto";
+  }
+
   return "stock";
 }
 
@@ -70,8 +79,8 @@ async function search(term: string, userId: number, ip: string): Promise<StockAp
   }
 }
 
-async function getLastPrice(symbol: string, userId: number, ip: string): Promise<any> {
-  const type = getAssetType(symbol);
+async function getLastPrice(symbol: string, userId: number, ip: string, marketHint?: string): Promise<any> {
+  const type = marketHint || getAssetType(symbol);
   const endpoint = type === "crypto" ? "crypto" : type === "forex" ? "forex" : "stock";
   
   const fetcher = async (s: string) => {
