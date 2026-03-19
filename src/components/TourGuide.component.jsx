@@ -29,7 +29,7 @@ const steps_fr = [
   { target: "tour-detail-chart-container", title: "📈 Historique", description: "Utilisez les boutons (1m, 3m, Tout) pour changer la période de temps affichée.", position: "top" },
   { target: "tour-detail-buy", title: "🎯 Passer un ordre", description: "Prêt à investir ? Cliquez ici pour ouvrir le formulaire d'achat et valider votre transaction.", position: "bottom-left" },
   { target: "tour-ranks-info", title: "🏆 Le Panthéon", description: "Découvrez qui sont les meilleurs investisseurs de la plateforme en temps réel.", position: "bottom" },
-  { target: "tour-ranks-performance", title: "🥇 Votre position", description: "Retrouvez votre rang mondial, votre capital total et votre progression par rapport aux 10 000 $ de départ.", position: "bottom" },
+  { target: "tour-ranks-performance", title: "🥇 Votre position", description: "Retrouvez votre rang, votre capital total et votre progression par rapport aux 10 000 $ de départ.", position: "bottom" },
   { target: "tour-ranks-table", title: "👥 Top Investisseurs", description: "Le classement est mis à jour en direct. Battez-vous pour atteindre le top du tableau !", position: "top" },
   { target: "tour-footer", title: "🆘 Besoin d'aide ?", description: "Un problème ou une question ? Rejoignez notre Discord ou contactez le support via ces liens.", position: "top" }
 ];
@@ -58,7 +58,7 @@ const steps_en = [
   { target: "tour-detail-chart-container", title: "📈 History", description: "Use the buttons (1m, 3m, All) to change the displayed time period.", position: "top" },
   { target: "tour-detail-buy", title: "🎯 Place an Order", description: "Ready to invest? Click here to open the buy form and confirm your transaction.", position: "bottom-left" },
   { target: "tour-ranks-info", title: "🏆 Hall of Fame", description: "Discover the platform's top investors in real time.", position: "bottom" },
-  { target: "tour-ranks-performance", title: "🥇 Your Ranking", description: "Find your global rank, total capital, and progress compared to the starting $10,000.", position: "bottom" },
+  { target: "tour-ranks-performance", title: "🥇 Your Ranking", description: "Find your rank, total capital, and progress compared to the starting $10,000.", position: "bottom" },
   { target: "tour-ranks-table", title: "👥 Top Investors", description: "The leaderboard is updated live. Fight your way to the top of the table!", position: "top" },
   { target: "tour-footer", title: "🆘 Need Help?", description: "Have a question or a problem? Join our Discord or contact support through these links.", position: "top" },
 ];
