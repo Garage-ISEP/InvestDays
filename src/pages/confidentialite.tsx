@@ -7,7 +7,7 @@ export default function Confidentialite() {
   return (
     <>
       <Head>
-        <title>InvestDays - Politique de Confidentialité</title>
+        <title>Invest Days - Politique de Confidentialité</title>
         <link rel="icon" href="/favicon3.ico" />
       </Head>
 
@@ -16,7 +16,7 @@ export default function Confidentialite() {
         <div className={homeStyles.welcomeSection}>
           <div>
             <h1 className={homeStyles.marketTitle}>Confidentialité</h1>
-            <p className={homeStyles.marketSub}>Comment nous protégeons vos données personnelles au Garage ISEP.</p>
+            <p className={homeStyles.marketSub}>Comment nous protégeons vos données personnelles au Garage Isep.</p>
           </div>
         </div>
 
@@ -24,7 +24,7 @@ export default function Confidentialite() {
           <section className={legalStyles.section}>
             <h2>1. Collecte des données</h2>
             <p>
-              Dans le cadre de la compétition InvestDays, nous collectons les informations suivantes lors de votre inscription :
+              Dans le cadre de la compétition Invest Days, nous collectons les informations suivantes lors de votre inscription :
             </p>
             <ul>
               <li><strong>Identité :</strong> Nom, Prénom.</li>

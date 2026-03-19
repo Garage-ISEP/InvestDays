@@ -25,7 +25,7 @@ export default function Wallet() {
   // Traductions de la page Portefeuille
   const translations = {
     fr: {
-      headTitle: "InvestDays - Portefeuille",
+      headTitle: "Invest Days - Portefeuille",
       title: "Portefeuille",
       sub: "Gérez vos actifs et visualisez vos performances",
       newBtn: "+ Nouveau portefeuille",
@@ -37,7 +37,7 @@ export default function Wallet() {
       toastError: "Erreur lors de la création."
     },
     en: {
-      headTitle: "InvestDays - Wallet",
+      headTitle: "Invest Days - Wallet",
       title: "Wallet",
       sub: "Manage your assets and track your performance",
       newBtn: "+ New Portfolio",

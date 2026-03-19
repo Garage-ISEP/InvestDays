@@ -115,7 +115,7 @@ export default function DetailAction(req: Request) {
 
   return (
     <>
-      <Head><title>InvestDays - {nameAction}</title>
+      <Head><title>Invest Days - {nameAction}</title>
       <link rel="icon" href="/favicon3.ico" />
       </Head>
       <main className={homeStyles.pageContainer}>

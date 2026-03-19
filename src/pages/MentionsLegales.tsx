@@ -7,7 +7,7 @@ export default function MentionsLegales() {
   return (
     <>
       <Head>
-        <title>InvestDays - Mentions Légales</title>
+        <title>Invest Days - Mentions Légales</title>
         <link rel="icon" href="/favicon3.ico" />
       </Head>
 

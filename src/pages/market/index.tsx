@@ -31,7 +31,7 @@ export default function Market() {
 
   const translations = {
     fr: {
-      headTitle:      "InvestTrade - Marchés",
+      headTitle:      "Invest Days - Marchés",
       title:          "Marchés",
       sub:            "Recherchez et analysez les actions en temps réel via Finage",
       cashLabel:      "Disponible",
@@ -49,7 +49,7 @@ export default function Market() {
       noResults:      "Aucun résultat",
     },
     en: {
-      headTitle:      "InvestTrade - Markets",
+      headTitle:      "Invest Days - Markets",
       title:          "Markets",
       sub:            "Search and analyze stocks in real-time via Finage",
       cashLabel:      "Available",

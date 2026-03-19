@@ -101,7 +101,7 @@ export default function AdminDashboard() {
   return (
     <>
       <Head>
-        <title>InvestDays - {t.title}</title>
+        <title>Invest Days - {t.title}</title>
         <link rel="icon" href="/favicon3.ico" />
       </Head>
 

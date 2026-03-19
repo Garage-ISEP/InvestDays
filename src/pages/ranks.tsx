@@ -17,7 +17,7 @@ export default function Ranks() {
 
   const translations = {
     fr: {
-      headTitle: "InvestDays - Classement Global",
+      headTitle: "Invest Days - Classement Global",
       title: "Classement Global",
       sub: "Basé sur la valeur totale indicative (Cash + Actions)",
       perfTitle: "Ta Performance",
@@ -27,7 +27,7 @@ export default function Ranks() {
       topTraders: "Top Investisseurs",
     },
     en: {
-      headTitle: "InvestDays - Global Ranking",
+      headTitle: "Invest Days - Global Ranking",
       title: "Global Ranking",
       sub: "Based on total indicative value (Cash + Stocks)",
       perfTitle: "Your Performance",

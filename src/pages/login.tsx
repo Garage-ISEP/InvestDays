@@ -16,7 +16,7 @@ export default function Login() {
 
   const translations = {
     fr: {
-      headTitle: "InvestDays - Connexion",
+      headTitle: "Invest Days - Connexion",
       tagline: "Simulez. Investissez. Progressez.",
       hint: "Connectez-vous avec votre compte ISEP",
       loginBtn: "Portail ISEP",
@@ -24,7 +24,7 @@ export default function Login() {
       errorSession: "Erreur lors de la lecture de la session.",
     },
     en: {
-      headTitle: "InvestDays - Login",
+      headTitle: "Invest Days - Login",
       tagline: "Simulate. Invest. Progress.",
       hint: "Log in with your ISEP account",
       loginBtn: "ISEP Portal",

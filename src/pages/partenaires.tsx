@@ -19,7 +19,7 @@ export default function Demo() {
   const [showPassword, setShowPassword] = useState(false);
 
   const t = (lang === "en" ? {
-    headTitle: "InvestDays - Demo",
+    headTitle: "Invest Days - Demo",
     tagline: "Simulate. Invest. Progress.",
     hint: "Visitor access",
     emailPlaceholder: "Email",
@@ -28,7 +28,7 @@ export default function Demo() {
     successToast: "Login successful!",
     errorCredentials: "Incorrect email or password.",
   } : {
-    headTitle: "InvestDays - Démo",
+    headTitle: "Invest Days - Démo",
     tagline: "Simulez. Investissez. Progressez.",
     hint: "Accès visiteur",
     emailPlaceholder: "Email",

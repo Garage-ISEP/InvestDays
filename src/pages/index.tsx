@@ -19,7 +19,7 @@ export default function Home() {
       title: "Accueil",
       poweredBy: "Données fournies par",
       hello: "Bonjour",
-      sub: "Bienvenue sur InvestDays",
+      sub: "Bienvenue sur Invest Days",
       rulesTitle: "📋 Règles du Jeu",
       rulesSub: "Tout ce que vous devez savoir pour participer",
       rules: [
@@ -27,12 +27,12 @@ export default function Home() {
         { icon: "📈", title: "Acheter une action", desc: "Rendez-vous sur la page Marchés, recherchez un actif (action, crypto, forex) et passez un ordre d'achat. Le prix est celui du marché en temps réel." },
         { icon: "📉", title: "Vendre une action", desc: "Depuis votre Portefeuille, sélectionnez l'actif que vous souhaitez vendre et passez un ordre de vente. Vous ne pouvez vendre que ce que vous possédez." },
         { icon: "🏆", title: "Comment gagner", desc: "Le classement est basé sur votre profit/perte total. Plus votre capital a augmenté par rapport aux 10 000 $ de départ, plus vous montez dans le classement." },
-        { icon: "👛", title: "Portefeuilles multiples", desc: "Vous pouvez créer jusqu'à 4 portefeuilles différents pour diversifier vos stratégies. Seul le meilleur portefeuille est pris en compte pour le classement." },
+        { icon: "👛", title: "Portefeuilles multiples", desc: "Vous pouvez créer jusqu'à 3 portefeuilles différents pour diversifier vos stratégies. Seul le meilleur portefeuille est pris en compte pour le classement." },
         { icon: "⏱️", title: "Horaires de marché", desc: "Les ordres sont exécutés uniquement lorsque les marchés sont ouverts. En dehors des horaires, vos ordres restent en attente jusqu'à la prochaine ouverture." },
         { icon: "⚠️", title: "Ordre refusé", desc: "Si vous n'avez pas assez de cash ou de titres en portefeuille, votre ordre sera automatiquement annulé. Vérifiez votre solde avant de trader !" },
         { icon: "📊", title: "Suivi de performance", desc: "Consultez la page Classement pour voir votre rang en temps réel et vous comparer aux autres investisseurs. La compétition est ouverte à tous !" },
-        { icon: "🔒", title: "Argent virtuel uniquement", desc: "Tout l'argent utilisé sur InvestDays est 100% virtuel. Aucune transaction réelle n'est effectuée. Tradez sans risque et apprenez les marchés financiers !" },
-        { icon: "🎓", title: "Objectif pédagogique", desc: "InvestDays est avant tout un outil d'apprentissage. L'objectif est de comprendre le fonctionnement des marchés financiers de manière ludique et interactive." },
+        { icon: "🔒", title: "Argent virtuel uniquement", desc: "Tout l'argent utilisé sur Invest Days est 100% virtuel. Aucune transaction réelle n'est effectuée. Tradez sans risque et apprenez les marchés financiers !" },
+        { icon: "🎓", title: "Objectif pédagogique", desc: "Invest Days est avant tout un outil d'apprentissage. L'objectif est de comprendre le fonctionnement des marchés financiers de manière ludique et interactive." },
       ],
       dashTitle: "📊 Mon Tableau de Bord",
       cashLabel: "Cash disponible",
@@ -55,7 +55,7 @@ export default function Home() {
       title: "Home",
       poweredBy: "Market data by",
       hello: "Hello",
-      sub: "Welcome to InvestDays",
+      sub: "Welcome to Invest Days",
       rulesTitle: "📋 Game Rules",
       rulesSub: "Everything you need to know to participate",
       rules: [
@@ -63,12 +63,12 @@ export default function Home() {
         { icon: "📈", title: "Buying a Stock", desc: "Go to the Markets page, search for an asset (stock, crypto, forex) and place a buy order. The price is the real-time market price." },
         { icon: "📉", title: "Selling a Stock", desc: "From your Portfolio page, select the asset you want to sell and place a sell order. You can only sell what you own." },
         { icon: "🏆", title: "How to Win", desc: "The leaderboard is based on your total profit/loss. The more your capital has grown from the starting $10,000, the higher you rank." },
-        { icon: "👛", title: "Multiple Portfolios", desc: "You can create up to 4 different portfolios to diversify your strategies. Only your best portfolio counts for the leaderboard." },
+        { icon: "👛", title: "Multiple Portfolios", desc: "You can create up to 3 different portfolios to diversify your strategies. Only your best portfolio counts for the leaderboard." },
         { icon: "⏱️", title: "Market Hours", desc: "Orders are only executed when markets are open. Outside trading hours, your orders stay pending until the next market open." },
         { icon: "⚠️", title: "Rejected Order", desc: "If you don't have enough cash or shares, your order will be automatically cancelled. Check your balance before trading!" },
         { icon: "📊", title: "Performance Tracking", desc: "Check the Leaderboard page to see your rank in real-time and compare yourself with other investors. The competition is open to all!" },
-        { icon: "🔒", title: "Virtual Money Only", desc: "All money used on InvestDays is 100% virtual. No real transactions are made. Trade risk-free and learn about financial markets!" },
-        { icon: "🎓", title: "Educational Goal", desc: "InvestDays is first and foremost a learning tool. The goal is to understand how financial markets work in a fun and interactive way." },
+        { icon: "🔒", title: "Virtual Money Only", desc: "All money used on Invest Days is 100% virtual. No real transactions are made. Trade risk-free and learn about financial markets!" },
+        { icon: "🎓", title: "Educational Goal", desc: "Invest Days is first and foremost a learning tool. The goal is to understand how financial markets work in a fun and interactive way." },
       ],
       dashTitle: "📊 My Dashboard",
       cashLabel: "Available cash",
@@ -114,7 +114,7 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>InvestDays - {t.title}</title>
+        <title>Invest Days - {t.title}</title>
         <link rel="icon" href="/favicon3.ico" />
       </Head>
 

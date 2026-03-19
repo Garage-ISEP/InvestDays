@@ -11,7 +11,7 @@ export default function Contact() {
   return (
     <>
       <Head>
-        <title>InvestDays - Contactez-nous</title>
+        <title>Invest Days - Contactez-nous</title>
         <link rel="icon" href="/favicon3.ico" />
       </Head>
 
