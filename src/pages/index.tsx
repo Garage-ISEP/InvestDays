@@ -20,7 +20,7 @@ export default function Home() {
       poweredBy: "Données fournies par",
       hello: "Bonjour",
       sub: "Bienvenue sur Invest Days",
-      rulesTitle: "📋 Règles du Jeu",
+      rulesTitle: "📋 Règles du concours",
       rulesSub: "Tout ce que vous devez savoir pour participer",
       rules: [
         { icon: "💰", title: "Capital de départ", desc: "Chaque joueur démarre avec 10 000 $ virtuels. Ce capital est identique pour tous — à vous d'en faire fructifier le maximum !" },
@@ -56,7 +56,7 @@ export default function Home() {
       poweredBy: "Market data by",
       hello: "Hello",
       sub: "Welcome to Invest Days",
-      rulesTitle: "📋 Game Rules",
+      rulesTitle: "📋 hackathon Rules",
       rulesSub: "Everything you need to know to participate",
       rules: [
         { icon: "💰", title: "Starting Capital", desc: "Every player starts with $10,000 in virtual cash. The capital is identical for everyone — make it grow as much as possible!" },
@@ -123,7 +123,7 @@ export default function Home() {
         <div className={homeStyles.welcomeSection}>
           <div>
             <h1 className={homeStyles.marketTitle}>
-              {t.hello} {(user as any)?.username || (user as any)?.email?.split('@')[0]} 👋
+              {t.hello} {(user as any)?.username || (user as any)?.email?.split('@')[0]} 
             </h1>
             <p className={homeStyles.marketSub}>{t.sub}</p>
           </div>
