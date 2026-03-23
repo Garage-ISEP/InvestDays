@@ -77,16 +77,6 @@ async function search(term: string, userId: number, ip: string): Promise<StockAp
 
     await new Promise(resolve => setTimeout(resolve, 300));
 
-    const alreadyFound = matches.some(m => m.symbol.toUpperCase() === cleanTerm);
-    if (!alreadyFound && cleanTerm.length >= 2 && isDisplayable(cleanTerm)) {
-      matches.unshift({
-        symbol: cleanTerm,
-        name: cleanTerm,
-        market: getAssetType(cleanTerm),
-        region: "Global",
-        currency: "USD"
-      });
-    }
 
     return matches;
   } catch (e) {
@@ -163,6 +153,7 @@ async function getPreviousClose(symbol: string, userId?: number, ip?: string) {
     const res = await getLastPrice(symbol, 0, "", "");
     return res.results?.[0]?.price || null;
 }
+
 
 async function getLogoStock(url?: string, userId?: string | number, ip?: string) {
   return "";
