@@ -18,16 +18,16 @@ export default function Login() {
     fr: {
       headTitle: "Invest Days - Connexion",
       tagline: "Simulez. Investissez. Progressez.",
-      hint: "Connectez-vous avec votre compte ISEP",
-      loginBtn: "Portail ISEP",
+      hint: "Connectez-vous avec votre compte Isep",
+      loginBtn: "Portail Isep",
       successToast: "Connexion réussie !",
       errorSession: "Erreur lors de la lecture de la session.",
     },
     en: {
       headTitle: "Invest Days - Login",
       tagline: "Simulate. Invest. Progress.",
-      hint: "Log in with your ISEP account",
-      loginBtn: "ISEP Portal",
+      hint: "Log in with your Isep account",
+      loginBtn: "Isep Portal",
       successToast: "Login successful!",
       errorSession: "Error reading session data.",
     }
@@ -148,7 +148,7 @@ export default function Login() {
               />
             </a>
           </div>
-          <p className={styles.footer}>InvestDays © 2025 — ISEP</p>
+          <p className={styles.footer}>Invest Days © 2025 — Isep</p>
         </div>
       </div>
     </>

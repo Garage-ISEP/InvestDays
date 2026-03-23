@@ -42,46 +42,78 @@ function isDisplayable(symbol: string): boolean {
 
 async function search(term: string, userId: number, ip: string): Promise<StockApi[]> {
   const matches: StockApi[] = [];
-  const cleanTerm = term.trim().toUpperCase();
 
   try {
-    const [stockRes, cryptoRes, forexRes] = await Promise.allSettled([
+    const [stockRes, frRes, cryptoRes, forexRes] = await Promise.allSettled([
       fetch(`https://api.finage.co.uk/fnd/search/market/us/${encodeURIComponent(term)}?limit=10&apikey=${FINAGE_API_KEY}`),
+      fetch(`https://api.finage.co.uk/fnd/search/market/fr/${encodeURIComponent(term)}?limit=10&apikey=${FINAGE_API_KEY}`),
       fetch(`https://api.finage.co.uk/fnd/search/cryptocurrency/${encodeURIComponent(term)}?limit=10&apikey=${FINAGE_API_KEY}`),
       fetch(`https://api.finage.co.uk/fnd/search/currency/${encodeURIComponent(term)}?limit=10&apikey=${FINAGE_API_KEY}`),
     ]);
 
-    const processResults = (res: any, market: string) => {
-      if (res.status === "fulfilled") {
-        res.value.json().then((d: any) => {
-          if (d?.results) {
-            d.results.forEach((i: any) => {
-              if (isDisplayable(i.symbol)) {
-                matches.push({
-                  symbol: i.symbol,
-                  name: i.description || i.name || `${i.from} / ${i.to}`,
-                  market: market as any,
-                  region: "Global",
-                  currency: "USD"
-                });
-              }
-            });
-          }
-        }).catch(() => {});
-      }
+    const parseResult = async (res: PromiseSettledResult<Response>, market: string) => {
+      if (res.status !== "fulfilled") return;
+      try {
+        const d = await res.value.json(); 
+        if (d?.results) {
+          d.results.forEach((i: any) => {
+            if (isDisplayable(i.symbol)) {
+              matches.push({
+                symbol: i.symbol,
+                name: i.description || i.name || `${i.from} / ${i.to}`,
+                market: market as any,
+                region: "Global",
+                currency: "USD",
+              });
+            }
+          });
+        }
+      } catch {}
     };
+    await Promise.all([
+      parseResult(stockRes, "stocks"),
+      parseResult(frRes, "stocks"),
+      parseResult(cryptoRes, "crypto"),
+      parseResult(forexRes, "forex"),
+    ]);
 
-    processResults(stockRes, "stocks");
-    processResults(cryptoRes, "crypto");
-    processResults(forexRes, "forex");
+  } catch {}
+const KNOWN_CRYPTO: Record<string, string> = {
+  "BTCUSD": "Bitcoin / USD",
+  "ETHUSD": "Ethereum / USD",
+  "SOLUSD": "Solana / USD",
+  "BNBUSD": "Binance Coin / USD",
+  "XRPUSD": "XRP / USD",
+  "ADAUSD": "Cardano / USD",
+  "DOGEUSD": "Dogecoin / USD",
+};
 
-    await new Promise(resolve => setTimeout(resolve, 300));
+const upperTerm = term.trim().toUpperCase();
+const alreadyFound = matches.some(m => m.symbol.toUpperCase() === upperTerm);
 
+if (!alreadyFound && KNOWN_CRYPTO[upperTerm]) {
+  matches.unshift({
+    symbol: upperTerm,
+    name: KNOWN_CRYPTO[upperTerm],
+    market: "crypto" as any,
+    region: "Global",
+    currency: "USD",
+  });
+}
 
-    return matches;
-  } catch (e) {
-    return matches;
-  }
+if (!alreadyFound && matches.length === 0) {
+  Object.entries(KNOWN_CRYPTO).forEach(([symbol, name]) => {
+    if (symbol.startsWith(upperTerm) || upperTerm.startsWith(symbol.slice(0, 3))) {
+      if (!matches.some(m => m.symbol === symbol)) {
+        matches.push({ symbol, name, market: "crypto" as any, region: "Global", currency: "USD" });
+      }
+    }
+  });
+}
+
+return matches;
+
+  return matches;
 }
 
 async function getLastPrice(symbol: string, userId: number, ip: string, marketHint?: string): Promise<any> {

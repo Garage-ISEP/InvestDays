@@ -30,7 +30,7 @@ export default function MentionsLegales() {
             <ul>
               <li><strong>Propriétaire :</strong> Garage ISEP – Association étudiante – 28 Rue Notre Dame des Champs, 75006 Paris</li>
               <li><strong>Responsable publication :</strong> Le Bureau du Garage ISEP</li>
-              <li><strong>Webmaster :</strong> Équipe technique InvestDays</li>
+              <li><strong>Webmaster :</strong> Équipe technique Invest Days</li>
               <li><strong>Hébergeur :</strong> Serveur ISEP</li>
             </ul>
           </section>
@@ -38,7 +38,7 @@ export default function MentionsLegales() {
           <section className={legalStyles.section}>
             <h2>2. Partenariats et Données Financières</h2>
             <p>
-              InvestDays utilise la technologie de <strong>Finage</strong> pour accéder aux données financières mondiales. 
+              Invest Days utilise la technologie de <strong>Finage</strong> pour accéder aux données financières mondiales. 
               Finage est un fournisseur leader de données financières précises en temps réel (actions, forex, crypto, etc.). 
               Les données sont fournies à titre indicatif dans un but pédagogique et ne constituent pas des conseils en investissement.
             </p>
@@ -57,7 +57,7 @@ export default function MentionsLegales() {
           <section className={legalStyles.section}>
             <h2>4. Limitations de responsabilité</h2>
             <p>
-              InvestDays est une plateforme de simulation boursière à visée éducative. Le Garage ISEP ne pourra être tenu 
+              Invest Days est une plateforme de simulation boursière à visée éducative. Le Garage ISEP ne pourra être tenu 
               responsable des dommages directs et indirects causés au matériel de l’utilisateur, ni des pertes financières 
               virtuelles subies dans le cadre de la compétition.
             </p>

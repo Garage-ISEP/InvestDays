@@ -142,7 +142,7 @@ export default function Market() {
       const name = (item.name || "").toLowerCase();
       const symbol = (item.symbol || "").toLowerCase();
       const warrantTerm = t.noWarrants.toLowerCase();
-      const bannedKeywords = ["anti", "0xbtc", "0xbitcoin","btcone", "bitcoinote", "bitcoin 2","bitcoin","bitcoin 3","bitcoin adult", "bitcoin air","bether","ethereum","ethos","ethplode"];
+      const bannedKeywords = ["anti", "0xbtc", "0xbitcoin","btcone", "bitcoinote", "bitcoin 2","bitcoin 3","bitcoin adult", "bitcoin air","bether","ethos","ethplode"];
 
       const isBanned = bannedKeywords.some(keyword => 
         name.includes(keyword) || symbol.includes(keyword)
