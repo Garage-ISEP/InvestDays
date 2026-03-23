@@ -16,6 +16,42 @@ const MARKET_TO_TYPE: Record<string, string> = {
   forex:  "forex",
 };
 
+function getMarketStatus(market: string): { open: boolean; label: { fr: string; en: string } } {
+  const now = new Date();
+  const day = now.getUTCDay(); // 0=dim, 6=sam
+  const hour = now.getUTCHours();
+  const min = now.getUTCMinutes();
+  const totalMin = hour * 60 + min;
+
+  if (market === "crypto") {
+    return { open: true, label: { fr: "Ouvert 24/7", en: "Open 24/7" } };
+  }
+
+  if (market === "forex") {
+    const isWeekend = day === 0 || day === 6;
+    return {
+      open: !isWeekend,
+      label: isWeekend
+        ? { fr: "Fermé (week-end)", en: "Closed (weekend)" }
+        : { fr: "Ouvert", en: "Open" },
+    };
+  }
+
+  if (market === "stocks") {
+    const isWeekend = day === 0 || day === 6;
+    const inSession = totalMin >= 870 && totalMin < 1350; 
+    const open = !isWeekend && inSession;
+    return {
+      open,
+      label: open
+        ? { fr: "Ouvert · 15h30–22h30", en: "Open · 3:30–10:30 PM" }
+        : { fr: "Fermé · 15h30–22h30", en: "Closed · 3:30–10:30 PM" },
+    };
+  }
+
+  return { open: false, label: { fr: "Inconnu", en: "Unknown" } };
+}
+
 export default function Market() {
   const { wallets, selectedId, selectWallet } = useWallet();
   const { lang } = useLanguage();
@@ -187,22 +223,39 @@ export default function Market() {
       </Head>
 
       <main className={homeStyles.pageContainer}>
+{/* Header */}
+<div id="tour-market-info" className={homeStyles.marketHeader} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
+  <div>
+    <h1 className={homeStyles.marketTitle}>{t.title}</h1>
+    <p className={homeStyles.marketSub}>{t.sub}</p>
+  </div>
 
-        {/* Header */}
-        <div id="tour-market-info" className={homeStyles.marketHeader} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
-          <div>
-            <h1 className={homeStyles.marketTitle}>{t.title}</h1>
-            <p className={homeStyles.marketSub}>{t.sub}</p>
-          </div>
-          <div className={homeStyles.statCard} style={{ display: 'flex', alignItems: 'center', padding: '12px 25px' }}>
-            <Image src="/assets/cash.svg" width={25} height={25} alt="cash" style={{ marginRight: '12px' }} />
-            <div>
-              <span style={{ fontSize: '11px', color: '#888', display: 'block', textTransform: 'uppercase' }}>{t.cashLabel}</span>
-              <span style={{ fontWeight: '700', fontSize: '18px' }}>{(wallets[selectedId]?.cash || 0).toLocaleString()} $</span>
-            </div>
-          </div>
-        </div>
+  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
 
+    {/* Statuts marchés */}
+<div className={marketStyles.marketStatusContainer}>
+  {[
+    { label: t.filterStocks, info: lang === 'fr' ? '15h30 – 22h30' : '9:30 AM – 4:30 PM' },
+    { label: t.filterForex,  info: lang === 'fr' ? 'Lun – Ven'     : 'Mon – Fri' },
+    { label: t.filterCrypto, info: '24/7' },
+  ].map(({ label, info }) => (
+    <div key={label} className={marketStyles.marketStatusRow}>
+      <span className={marketStyles.marketStatusLabel}>{label}</span>
+      <span className={marketStyles.marketStatusBadge}>🕐 {info}</span>
+    </div>
+  ))}
+</div>
+    {/* Valeur disponible */}
+    <div className={homeStyles.statCard} style={{ display: 'flex', alignItems: 'center', padding: '12px 25px' }}>
+      <Image src="/assets/cash.svg" width={25} height={25} alt="cash" style={{ marginRight: '12px' }} />
+      <div>
+        <span style={{ fontSize: '11px', color: '#888', display: 'block', textTransform: 'uppercase' }}>{t.cashLabel}</span>
+        <span style={{ fontWeight: '700', fontSize: '18px' }}>{(wallets[selectedId]?.cash || 0).toLocaleString()} $</span>
+      </div>
+    </div>
+
+  </div>
+</div>
         {/* Filtres portefeuille */}
         <div className={homeStyles.filterBar} style={{ marginBottom: '20px' }}>
           {wallets.map((_, index) => (

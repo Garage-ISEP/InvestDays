@@ -80,3 +80,69 @@
     font-size: 13px;
   }
 }
+
+/* ─────────────────────────────────────────
+   STATUTS MARCHÉS
+───────────────────────────────────────── */
+.marketStatusContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-end;
+  margin-right: 12px;
+}
+
+.marketStatusRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.marketStatusLabel {
+  font-size: 12px;
+  color: #aaa;
+  font-weight: 500;
+}
+
+.marketStatusBadge {
+  font-size: 11px;
+  font-weight: 600;
+  color: #555;
+  background-color: #ffffff;
+  border-radius: 20px;
+  padding: 2px 10px;
+  border: 1px solid #e0e0e0;
+  white-space: nowrap;
+}
+
+/* ─────────────────────────────────────────
+   RESPONSIVE — Tablette (≤ 750px)
+───────────────────────────────────────── */
+@media screen and (max-width: 750px) {
+  .marketStatusContainer {
+    align-items: flex-start;
+    margin-right: 0;
+    margin-bottom: 10px;
+  }
+}
+
+/* ─────────────────────────────────────────
+   RESPONSIVE — Mobile (≤ 480px)
+───────────────────────────────────────── */
+@media screen and (max-width: 480px) {
+  .marketStatusContainer {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 4px;
+    justify-content: flex-start;
+  }
+
+  .marketStatusBadge {
+    font-size: 10px;
+    padding: 2px 8px;
+  }
+
+  .marketStatusLabel {
+    font-size: 11px;
+  }
+}
