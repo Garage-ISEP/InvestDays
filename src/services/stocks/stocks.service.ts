@@ -19,6 +19,20 @@ function getAssetType(symbol: string, marketHint?: string): "crypto" | "forex" |
   return "stock";
 }
 
+function isWithinTradingHours(): boolean {
+  const now = new Date();
+  const utcHour = now.getUTCHours();
+  const utcMin = now.getUTCMinutes();
+  const totalMin = utcHour * 60 + utcMin;
+  const day = now.getUTCDay();
+  return day >= 1 && day <= 5 && totalMin >= 870 && totalMin < 1260;
+}
+
+function isMarketOpen(marketStatus?: string): boolean {
+  if (!marketStatus) return isWithinTradingHours();
+  return ["open", "extended-hours"].includes(marketStatus.toLowerCase());
+}
+
 function isDisplayable(symbol: string): boolean {
   const s = symbol.toUpperCase();
   if (s.includes('.') || s.includes('+') || s.includes('-')) return false;
@@ -83,7 +97,6 @@ async function search(term: string, userId: number, ip: string): Promise<StockAp
 async function getLastPrice(symbol: string, userId: number, ip: string, marketHint?: string): Promise<any> {
   const type = getAssetType(symbol, marketHint);
   const endpoint = type === "crypto" ? "crypto" : type === "forex" ? "forex" : "stock";
-  
   const formatted = (type === "stock") ? symbol.toUpperCase() : symbol.toLowerCase();
 
   try {
@@ -92,15 +105,28 @@ async function getLastPrice(symbol: string, userId: number, ip: string, marketHi
     const price = data.price || data.p || data.last || data.ask || data.bid;
 
     if (price && price > 0) {
-      return { results: [{ price, symbol: symbol.toUpperCase(), market_status: data.market_status || "open" }] };
+      return { 
+        results: [{ 
+          price, 
+          symbol: symbol.toUpperCase(), 
+          market_status: data.market_status || (isWithinTradingHours() ? "open" : "closed")
+        }] 
+      };
     }
 
     const aggData = await getRecentPrices(symbol, "1M", userId, ip, type);
     if (aggData?.results?.length > 0) {
       const last = aggData.results[aggData.results.length - 1];
-      return { results: [{ price: last.c, symbol: symbol.toUpperCase(), market_status: "open" }] };
+      return { 
+        results: [{ 
+          price: last.c, 
+          symbol: symbol.toUpperCase(), 
+          market_status: isWithinTradingHours() ? "open" : "closed"
+        }] 
+      };
     }
   } catch (e) {}
+  
   return { results: [] };
 }
 

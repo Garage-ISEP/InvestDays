@@ -15,6 +15,15 @@ import { useAuthentification } from "../../context/AuthContext";
 
 type TimeRange = "1H" | "1D" | "1W" | "1M" | "ALL";
 
+function isWithinTradingHours(): boolean {
+  const now = new Date();
+  const utcHour = now.getUTCHours();
+  const utcMin = now.getUTCMinutes();
+  const totalMin = utcHour * 60 + utcMin;
+  const day = now.getUTCDay();
+  return day >= 1 && day <= 5 && totalMin >= 870 && totalMin < 1260;
+}
+
 export default function DetailAction(req: Request) {
   const [data, setData] = useState<any>({ results: [] });
   const [isOpen, setIsOpen] = useState(false);
@@ -58,13 +67,18 @@ export default function DetailAction(req: Request) {
     return { line, candle };
   }, [data, detail?.price]);
 
-  async function fetchDetail(symbol: string) {
-    try {
-      const response = await fetch.get("/api/stock/detail?symbol=" + symbol);
-      const price = await getPrice(symbol);
-      setDetail({ ...response.results, price });
-    } catch (e) {}
-  }
+async function fetchDetail(symbol: string) {
+  try {
+    const response = await fetch.get("/api/stock/detail?symbol=" + symbol);
+    const price = await getPrice(symbol);
+    const lastPriceRes = await fetch.get("/api/stock/lastPrice?symbol=" + symbol);  
+    setDetail({ 
+      ...response.results, 
+      price,
+      market_status: lastPriceRes?.results?.[0]?.market_status || (isWithinTradingHours() ? "open" : "closed")
+    });
+  } catch (e) {}
+}
 
   async function fetchData(symbol: string, selectedRange: TimeRange) {
     setLoadingChart(true);
@@ -199,6 +213,7 @@ export default function DetailAction(req: Request) {
           open={isOpen} 
           close={() => setIsOpen(false)} 
           lang={lang} 
+          isMarketOpen={detail?.market_status === "open"}
         />
       </main>
     </>
