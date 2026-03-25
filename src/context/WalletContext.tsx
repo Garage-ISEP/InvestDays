@@ -1,4 +1,3 @@
-// Create a react context TestContext with TypeScript
 import React, {
   useState,
   createContext,
@@ -27,6 +26,7 @@ interface WalletContext {
     id: number;
     name: string;
     transactions: Array<transaction>;
+    user?: { id: number; email: string; isAdmin: boolean };
   }>;
   walletsLines: any;
   selectedId: number;
@@ -47,31 +47,19 @@ const WalletContext = createContext<WalletContext>({
   valuesCached: {},
   assetsCached: 0,
   getPrice: (symbol: string) => {
-    return new Promise((resolve, reject) => {
-      resolve(0);
-    });
+    return new Promise((resolve) => resolve(0));
   },
 });
 
 const WalletProvider = ({ children }: { children: any }) => {
   const fetch = useFetch();
   const { isAuthenticated, user } = useAuthentification();
-  const [wallets, setWallets] = useState<
-    Array<{
-      id: number;
-      name: string;
-      cash?: number;
-      transactions: Array<transaction>;
-    }>
-  >([]);
+  const [wallets, setWallets] = useState<any[]>([]);
   const [walletsLines, setWalletsLines] = useState<any>({});
   const [selectedId, setSelectedId] = useState(() => {
-  if (typeof window === "undefined") return 0;
-  return parseInt(localStorage.getItem("selectedWalletId") || "0", 10);
-});
-useEffect(() => {
-  localStorage.setItem("selectedWalletId", String(selectedId));
-}, [selectedId]);
+    if (typeof window === "undefined") return 0;
+    return parseInt(localStorage.getItem("selectedWalletId") || "0", 10);
+  });
   const [assetsCached, setAssetsCached] = useState(0);
   const [valuesCached, setValuesCached] = useState<{
     [key: string]: { value: number; date: number };
@@ -81,6 +69,10 @@ useEffect(() => {
   valuesCachedRef.current = valuesCached;
   const selectedIdRef = useRef(selectedId);
   selectedIdRef.current = selectedId;
+
+  useEffect(() => {
+    localStorage.setItem("selectedWalletId", String(selectedId));
+  }, [selectedId]);
 
   async function actualiseWallets(walletId: number) {}
 
@@ -105,12 +97,8 @@ useEffect(() => {
     let trans: any;
 
     if (!wallet) {
-      if (!walletId) {
-        walletId = selectedId;
-      }
-      if (!wallets[walletId]) {
-        return;
-      }
+      if (!walletId) walletId = selectedId;
+      if (!wallets[walletId]) return;
       trans = wallets[walletId].transactions;
     } else {
       if (!wallet[walletId] || !wallet[walletId].transactions) return;
@@ -143,12 +131,7 @@ useEffect(() => {
               : transaction.quantity,
             valueAtExecution: transaction.isSellOrder
               ? []
-              : [
-                  {
-                    quantity: transaction.quantity,
-                    price: transaction.valueAtExecution,
-                  },
-                ],
+              : [{ quantity: transaction.quantity, price: transaction.valueAtExecution }],
           });
         } else {
           acc[index].quantity += transaction.isSellOrder
@@ -180,21 +163,16 @@ useEffect(() => {
       let validPrice = 0;
       if (typeof response === "number") {
         validPrice = response;
-      } else if (response?.results && response.results.length > 0 && response.results[0].price) {
+      } else if (response?.results?.length > 0 && response.results[0].price) {
         validPrice = response.results[0].price;
       } else if (response?.price) {
         validPrice = response.price;
       }
 
-      setValuesCached((prev) => {
-        return {
-          ...prev,
-          [symbol]: {
-            value: validPrice,
-            date: Date.now(),
-          },
-        };
-      });
+      setValuesCached((prev) => ({
+        ...prev,
+        [symbol]: { value: validPrice, date: Date.now() },
+      }));
       return validPrice;
     } catch (error) {
       return 0;
@@ -216,14 +194,15 @@ useEffect(() => {
 
   async function refreshWallets(walletId: number | null = null) {
     const id = walletId ?? selectedIdRef.current;
-    const userWallets = await fetch.get("/api/wallet");
+    const isAdmin = (user as any)?.isAdmin || (user as any)?.admin;
+    const endpoint = isAdmin ? "/api/admin/wallets" : "/api/wallet";
+    const userWallets = await fetch.get(endpoint);
     setWallets(userWallets);
     actualiseWalletsLines(id, userWallets);
   }
 
   useEffect(() => {
     if (!isAuthenticated || !user) return;
-
     const interval = setInterval(() => {
       refreshWallets();
     }, 4000);
