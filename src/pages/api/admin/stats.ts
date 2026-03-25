@@ -14,76 +14,80 @@ async function getAdminStats(req: AuthenticatedRequest, res: NextApiResponse) {
   const authUser = req.user ?? req.auth;
 
   if (!authUser || !(authUser as any).isAdmin) {
-    return res.status(403).json({ 
-      status: "error", 
-      message: "Accès réservé aux administrateurs" 
+    return res.status(403).json({
+      status: "error",
+      message: "Accès réservé aux administrateurs",
     });
   }
 
   try {
     const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
     const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-    const startDate = new Date("2024-01-01"); // Date de début du concours
+    const startDate = new Date("2024-01-01");
 
     const [
-      userCount, 
-      transactionCount, 
-      walletStats, 
-      recentTransactions, 
-      history, 
+      userCount,
+      transactionCount,
+      walletStats,
+      recentTransactions,
+      history,
       newWallets,
       activeRatioGroup,
-      allTimeTransactions
+      allTimeTransactions,
+      symbolGroups,
     ] = await Promise.all([
       prisma.user.count(),
       prisma.transaction.count(),
       prisma.wallet.aggregate({
+        where: { user: { isAdmin: false } },
         _sum: { cash: true },
-        _avg: { cash: true }
+        _avg: { cash: true },
       }),
-      // Pour les stats journalières (actifs et flux)
+      // Stats journalières (actifs et flux)
       prisma.transaction.findMany({
         where: { createdAt: { gte: thirtyDaysAgo }, status: "EXECUTED" },
         select: { createdAt: true, walletId: true },
-        orderBy: { createdAt: "asc" }
+        orderBy: { createdAt: "asc" },
       }),
       prisma.history.findMany({
         where: { date: { gte: thirtyDaysAgo } },
         select: { date: true, walletValue: true },
-        orderBy: { date: "asc" }
+        orderBy: { date: "asc" },
       }),
       prisma.wallet.findMany({
         where: { createdAt: { gte: thirtyDaysAgo } },
         select: { createdAt: true },
-        orderBy: { createdAt: "asc" }
+        orderBy: { createdAt: "asc" },
       }),
       // Ratio : au moins 5 tx sur 7 jours
       prisma.transaction.groupBy({
         by: [Prisma.TransactionScalarFieldEnum.walletId],
         where: { createdAt: { gte: sevenDaysAgo }, status: "EXECUTED" },
         _count: { id: true },
-        having: { id: { _count: { gte: 5 } } }
+        having: { id: { _count: { gte: 5 } } },
       }),
-      // Pour la courbe de croissance cumulée
+      // Courbe de croissance cumulée
       prisma.transaction.findMany({
         where: { status: "EXECUTED", createdAt: { gte: startDate } },
         select: { createdAt: true },
-        orderBy: { createdAt: "asc" }
-      })
+        orderBy: { createdAt: "asc" },
+      }),
+      // Répartition par symbole
+      prisma.transaction.groupBy({
+        by: ["symbol"],
+        where: { status: "EXECUTED" },
+        _count: { id: true },
+      }),
     ]);
 
-    // 1. CALCUL DES UTILISATEURS ACTIFS UNIQUES PAR JOUR (Logique Set)
+    // 1. UTILISATEURS ACTIFS UNIQUES PAR JOUR
     const activeUsersByDay: Record<string, Set<number>> = {};
     const txByDay: Record<string, number> = {};
 
-    recentTransactions.forEach(tx => {
+    recentTransactions.forEach((tx) => {
       const day = tx.createdAt.toISOString().split("T")[0];
-      
-      // Compte unique par jour
       if (!activeUsersByDay[day]) activeUsersByDay[day] = new Set();
       activeUsersByDay[day].add(tx.walletId);
-
-      // Volume total de transactions par jour
       txByDay[day] = (txByDay[day] || 0) + 1;
     });
 
@@ -97,29 +101,29 @@ async function getAdminStats(req: AuthenticatedRequest, res: NextApiResponse) {
 
     // 2. MASSE MONÉTAIRE PAR JOUR
     const cashByDay: Record<string, number> = {};
-    history.forEach(h => {
+    history.forEach((h) => {
       const day = h.date.toISOString().split("T")[0];
       cashByDay[day] = (cashByDay[day] || 0) + h.walletValue;
     });
-    const cashPerDay = Object.entries(cashByDay).map(([date, total]) => ({ 
-      date, 
-      total: parseFloat(total.toFixed(2)) 
+    const cashPerDay = Object.entries(cashByDay).map(([date, total]) => ({
+      date,
+      total: parseFloat(total.toFixed(2)),
     }));
 
     // 3. INSCRIPTIONS (30j)
     const registrationsByDay: Record<string, number> = {};
-    newWallets.forEach(w => {
+    newWallets.forEach((w) => {
       const day = w.createdAt.toISOString().split("T")[0];
       registrationsByDay[day] = (registrationsByDay[day] || 0) + 1;
     });
     const regData = Object.entries(registrationsByDay).map(([date, count]) => ({ date, count }));
 
-    // 4. CROISSANCE GLOBALE (CUMULÉE)
+    // 4. CROISSANCE GLOBALE CUMULÉE
     const globalGrowthData: { date: string; total: number }[] = [];
     let runningTotal = 0;
     const globalDailyCounts: Record<string, number> = {};
 
-    allTimeTransactions.forEach(tx => {
+    allTimeTransactions.forEach((tx) => {
       const day = tx.createdAt.toISOString().split("T")[0];
       globalDailyCounts[day] = (globalDailyCounts[day] || 0) + 1;
     });
@@ -135,6 +139,34 @@ async function getAdminStats(req: AuthenticatedRequest, res: NextApiResponse) {
     const activeCount = activeRatioGroup.length;
     const inactiveCount = Math.max(0, userCount - activeCount);
 
+    // 6. RÉPARTITION CRYPTO / FOREX / ACTIONS
+    const forexPairs = [
+      "EURUSD", "USDJPY", "GBPUSD", "USDCHF", "AUDUSD",
+      "USDCAD", "NZDUSD", "EURJPY", "GBPJPY", "EURGBP",
+    ];
+    let cryptoCount = 0, forexCount = 0, stockCount = 0;
+
+    symbolGroups.forEach(({ symbol, _count }) => {
+      const sym = symbol.toUpperCase();
+      const isForex = forexPairs.includes(sym) || sym.includes("/");
+      const isCrypto =
+        !isForex &&
+        (sym.endsWith("USDT") ||
+          sym.endsWith("BTC") ||
+          sym.endsWith("ETH") ||
+          (sym.endsWith("USD") && sym.length > 6));
+
+      if (isCrypto) cryptoCount += _count.id;
+      else if (isForex) forexCount += _count.id;
+      else stockCount += _count.id;
+    });
+
+    const assetTypeRatio = [
+      { name: "Actions", value: stockCount },
+      { name: "Crypto", value: cryptoCount },
+      { name: "Forex", value: forexCount },
+    ];
+
     res.status(200).json({
       status: "success",
       data: {
@@ -145,13 +177,14 @@ async function getAdminStats(req: AuthenticatedRequest, res: NextApiResponse) {
         transactionsPerDay,
         cashPerDay,
         registrationsPerDay: regData,
-        activeUsersPerDay, // <-- Nouveau champ
+        activeUsersPerDay,
         cumulativeTransactions: globalGrowthData,
         activeRatio: [
           { name: "Actifs", value: activeCount },
-          { name: "Inactifs", value: inactiveCount }
-        ]
-      }
+          { name: "Inactifs", value: inactiveCount },
+        ],
+        assetTypeRatio,
+      },
     });
   } catch (error) {
     console.error("Stats Error:", error);

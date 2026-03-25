@@ -23,6 +23,8 @@ interface User {
 
 const COLORS = ["#4CAF50", "#FF5252"]; // Vert = Actifs, Rouge = Inactifs
 
+const ASSET_COLORS = ["#2196F3", "#f3ca3e", "#4CAF50"];
+
 export default function AdminDashboard() {
   const { user } = useAuthentification() as { user: User | null };
   const { lang } = useLanguage();
@@ -214,6 +216,23 @@ export default function AdminDashboard() {
                   name="Participants actifs" 
                 />
               </BarChart>
+            </ChartBox>
+            <ChartBox title="Répartition Actions / Crypto / Forex" empty={!stats.assetTypeRatio} noData={t.noData}>
+              <PieChart>
+                <Pie
+                  data={stats.assetTypeRatio}
+                  cx="50%" cy="50%"
+                  innerRadius={60} outerRadius={80}
+                  paddingAngle={5} dataKey="value"
+                  label={({ name, percent = 0 }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                >
+                  {stats.assetTypeRatio.map((_: any, index: number) => (
+                    <Cell key={`cell-asset-${index}`} fill={ASSET_COLORS[index % ASSET_COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+                <Legend />
+              </PieChart>
             </ChartBox>
           </>
         )}
