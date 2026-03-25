@@ -17,7 +17,7 @@ function AuthProvider({ children }) {
   function reLogin() {
     if (typeof window === "undefined") return false;
     try {
-      const stored = window.sessionStorage.getItem("lastUser");
+      const stored = window.localStorage.getItem("lastUser");
       if (stored) {
         const parsed = JSON.parse(stored);
         if (parsed.token) {
@@ -34,7 +34,7 @@ function AuthProvider({ children }) {
 
 function completeCasLogin(userData) {
   if (userData && userData.token) {
-    window.sessionStorage.setItem("lastUser", JSON.stringify(userData));
+    window.localStorage.setItem("lastUser", JSON.stringify(userData));
     setUser(userData);
     setIsAuthenticated(true);
     
@@ -47,7 +47,7 @@ function completeCasLogin(userData) {
 }
 
   async function logout() {
-    window.sessionStorage.removeItem("lastUser");
+    window.localStorage.removeItem("lastUser");
     setIsAuthenticated(false);
     setUser(null);
     window.location.href = "/login";
