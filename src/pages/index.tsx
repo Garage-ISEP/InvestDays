@@ -36,7 +36,7 @@ export default function Home() {
       ],
       dashTitle: "📊 Mon Tableau de Bord",
       cashLabel: "Cash disponible",
-      assetsLabel: "Valeur des actions",
+      assetsLabel: "Valeur des actifs",
       totalLabel: "Valeur totale",
       profitLabel: "Profit / Perte",
       portfolioTitle: "Mon Portefeuille",
@@ -56,14 +56,14 @@ export default function Home() {
       poweredBy: "Market data by",
       hello: "Hello",
       sub: "Welcome to Invest Days",
-      rulesTitle: "📋 hackathon Rules",
+      rulesTitle: "📋 Hackathon Rules",
       rulesSub: "Everything you need to know to participate",
       rules: [
         { icon: "💰", title: "Starting Capital", desc: "Every player starts with $10,000 in virtual cash. The capital is identical for everyone — make it grow as much as possible!" },
         { icon: "📈", title: "Buying a Stock", desc: "Go to the Markets page, search for an asset (stock, crypto, forex) and place a buy order. The price is the real-time market price." },
         { icon: "📉", title: "Selling a Stock", desc: "From your wallet page, select the asset you want to sell and place a sell order. You can only sell what you own." },
         { icon: "🏆", title: "How to Win", desc: "The leaderboard is based on your total profit/loss. The more your capital has grown from the starting $10,000, the higher you rank." },
-        { icon: "👛", title: "Multiple Portfolios", desc: "You can create up to 3 different wallet to diversify your strategies. Only your best wallet counts for the leaderboard." },
+        { icon: "👛", title: "Multiple Portfolios", desc: "You can create up to 3 different wallets to diversify your strategies. Only your best wallet counts for the leaderboard." },
         { icon: "⏱️", title: "Market Hours", desc: "Orders are only executed when markets are open. Outside trading hours, your orders stay pending until the next market open." },
         { icon: "⚠️", title: "Rejected Order", desc: "If you don't have enough cash or shares, your order will be automatically cancelled. Check your balance before trading!" },
         { icon: "📊", title: "Performance Tracking", desc: "Check the Leaderboard page to see your rank in real-time and compare yourself with other investors. The competition is open to all!" },
@@ -266,6 +266,18 @@ export default function Home() {
       </main>
     </>
   );
+}
+
+export async function getServerSideProps() {
+  const cronKey = process.env.CRON_SECRET || ""; 
+  
+  try {
+    await fetch(`http://127.0.0.1:3000/api/cron/process?key=${cronKey}`);
+  } catch (e) {
+    console.error("Cron trigger failed during SSR");
+  }
+
+  return { props: {} };
 }
 
 Home.getLayout = function getLayout(page: any) {

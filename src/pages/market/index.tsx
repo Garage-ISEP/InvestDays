@@ -278,7 +278,7 @@ export default function Market() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div className={marketStyles.marketStatusContainer}>
               {[
-                { label: t.filterStocks, info: lang === 'fr' ? '15h30 – 22h30' : '9:30 AM – 4:30 PM' },
+                { label: t.filterStocks, info: lang === 'fr' ? '14h30 – 21h00' : '9:30 AM – 3:00 PM' },
                 { label: t.filterForex,  info: lang === 'fr' ? 'Lun – Ven'     : 'Mon – Fri' },
                 { label: t.filterCrypto, info: '24/7' },
               ].map(({ label, info }) => (
