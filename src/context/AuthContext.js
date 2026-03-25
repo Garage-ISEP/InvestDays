@@ -32,17 +32,19 @@ function AuthProvider({ children }) {
     return false;
   }
 
-  function completeCasLogin(userData) {
-    if (userData && userData.token) {
-      window.sessionStorage.setItem("lastUser", JSON.stringify(userData));
-      setUser(userData);
-      setIsAuthenticated(true);
-      
+function completeCasLogin(userData) {
+  if (userData && userData.token) {
+    window.sessionStorage.setItem("lastUser", JSON.stringify(userData));
+    setUser(userData);
+    setIsAuthenticated(true);
+    
+    setTimeout(() => {
       router.push("/").catch(() => {
         window.location.href = "/";
       });
-    }
+    }, 100);
   }
+}
 
   async function logout() {
     window.sessionStorage.removeItem("lastUser");
@@ -67,18 +69,19 @@ const ProtectRoute = ({ children }) => {
   const router = useRouter();
   const [isLoaded, setIsLoaded] = useState(false);
 
-  useEffect(() => {
-    const isAuth = isAuthenticated || reLogin();
-    const path = router.pathname; 
+useEffect(() => {
+  const isAuth = isAuthenticated || reLogin();
+  const path = router.pathname;
 
-if (!isAuth && path !== "/login" && path !== "/partenaires") {
-  router.push("/login");
-} else if (isAuth && (path === "/login" || path === "/partenaires")) {
+  if (!isAuth && path !== "/login" && path !== "/partenaires") {
+    router.push("/login");
+  } else {
+    setIsLoaded(true); // ← retire le else if, laisse toujours render
+    if (isAuth && (path === "/login" || path === "/partenaires")) {
       router.push("/");
-    } else {
-      setIsLoaded(true);
     }
-  }, [isAuthenticated, router.pathname]);
+  }
+}, [isAuthenticated, router.pathname]);
 
   return (isLoaded || router.pathname === "/login") ? children : null;
 };
