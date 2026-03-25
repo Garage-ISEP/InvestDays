@@ -22,6 +22,7 @@ export default function Login() {
       loginBtn: "Portail Isep",
       successToast: "Connexion réussie !",
       errorSession: "Erreur lors de la lecture de la session.",
+      errorAccess: "Votre email n'est pas autorisé à accéder à Invest Days.",
     },
     en: {
       headTitle: "Invest Days - Login",
@@ -30,30 +31,38 @@ export default function Login() {
       loginBtn: "Isep Portal",
       successToast: "Login successful!",
       errorSession: "Error reading session data.",
+        errorAccess: "Your email is not authorized to access Invest Days.",
     }
   };
 
   const t = translations[lang as keyof typeof translations] || translations.fr;
-
-  useEffect(() => {
-    if (router.isReady && router.query.user) {
-      try {
-        const rawData = Array.isArray(router.query.user) ? router.query.user[0] : router.query.user;
-        const userData = JSON.parse(decodeURIComponent(rawData));
-        completeCasLogin(userData);
-        toast.success(t.successToast, {
-          className: styles.customToast,
-          progressClassName: styles.customProgress,
-        });
-      } catch (e) {
-        setError(t.errorSession);
-      }
+useEffect(() => {
+  if (router.isReady && router.query.error) {
+    const errorCode = router.query.error as string;
+    if (errorCode === "Acces_non_autorise") {
+      setError(t.errorAccess);
+    } else {
+      setError(t.errorSession);
     }
-  }, [router.isReady, router.query]);
+  }
+}, [router.isReady, router.query]);
 
-  useEffect(() => {
-    if (isAuthenticated) router.push("/");
-  }, [isAuthenticated]);
+useEffect(() => {
+  if (router.isReady && router.query.user) {
+    try {
+      const rawData = Array.isArray(router.query.user) ? router.query.user[0] : router.query.user;
+      const userData = JSON.parse(decodeURIComponent(rawData));
+      completeCasLogin(userData);
+      toast.success(t.successToast, {
+        className: styles.customToast,
+        progressClassName: styles.customProgress,
+      });
+    } catch (e) {
+      setError(t.errorSession);
+    }
+  }
+}, [router.isReady, router.query]);
+
 
   const handleLoginISEP = () => {
     setLoading(true);
