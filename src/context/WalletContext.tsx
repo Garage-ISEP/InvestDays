@@ -35,6 +35,7 @@ interface WalletContext {
   assetsCached: number;
   getPrice: (symbol: string) => Promise<number>;
 }
+
 const WalletContext = createContext<WalletContext>({
   actualiseWallets: (walletId: number) => {},
   actualiseWalletsLines: (walletId: number) => {},
@@ -65,12 +66,16 @@ const WalletProvider = ({ children }: { children: any }) => {
   >([]);
   const [walletsLines, setWalletsLines] = useState<any>({});
   const [selectedId, setSelectedId] = useState(0);
-  const [assetsCached, setAssetsCached] = useState(0); 
+  const [assetsCached, setAssetsCached] = useState(0);
   const [valuesCached, setValuesCached] = useState<{
     [key: string]: { value: number; date: number };
-  }>({}); 
+  }>({});
+
   const valuesCachedRef = useRef(valuesCached);
   valuesCachedRef.current = valuesCached;
+  const selectedIdRef = useRef(selectedId);
+  selectedIdRef.current = selectedId;
+
   async function actualiseWallets(walletId: number) {}
 
   useEffect(() => {
@@ -89,6 +94,7 @@ const WalletProvider = ({ children }: { children: any }) => {
       setAssetsCached(assetsValues);
     }
   }
+
   function actualiseWalletsLines(walletId: number, wallet: any) {
     let trans: any;
 
@@ -104,18 +110,19 @@ const WalletProvider = ({ children }: { children: any }) => {
       if (!wallet[walletId] || !wallet[walletId].transactions) return;
       trans = wallet[walletId].transactions;
     }
+
     getRealLines(trans).then((lines) => {
       setWalletsLines({
         ...walletsLines,
         [walletId]: lines,
       });
-
       fillLines(lines, walletId);
     });
+
     if (wallet) calculateAssets();
   }
-  async function getRealLines(transactions: any) {
 
+  async function getRealLines(transactions: any) {
     let acc: any = [];
     transactions.forEach((transaction: any) => {
       if (transaction.status === "EXECUTED") {
@@ -151,42 +158,43 @@ const WalletProvider = ({ children }: { children: any }) => {
       }
     });
     acc = acc.filter((item: any) => item.quantity > 0.000000001);
-
     return acc;
   }
-async function getPrice(symbol: string): Promise<number> {
-  try {
-    if (
-      valuesCachedRef.current[symbol] &&
-      valuesCachedRef.current[symbol].date > Date.now() - 10000
-    ) {
-      return valuesCachedRef.current[symbol].value;
-    }
 
-    const response: any = await fetch.get("/api/stock/lastPrice?symbol=" + symbol);
-    let validPrice = 0;
-    if (typeof response === 'number') {
-      validPrice = response;
-    } else if (response?.results && response.results.length > 0 && response.results[0].price) {
-      validPrice = response.results[0].price; 
-    } else if (response?.price) {
-      validPrice = response.price; 
-    }
+  async function getPrice(symbol: string): Promise<number> {
+    try {
+      if (
+        valuesCachedRef.current[symbol] &&
+        valuesCachedRef.current[symbol].date > Date.now() - 10000
+      ) {
+        return valuesCachedRef.current[symbol].value;
+      }
 
-    setValuesCached((prev) => {
-      return {
-        ...prev,
-        [symbol]: {
-          value: validPrice,
-          date: Date.now(),
-        },
-      };
-    });
-    return validPrice;
-  } catch (error) {
-    return 0; 
+      const response: any = await fetch.get("/api/stock/lastPrice?symbol=" + symbol);
+      let validPrice = 0;
+      if (typeof response === "number") {
+        validPrice = response;
+      } else if (response?.results && response.results.length > 0 && response.results[0].price) {
+        validPrice = response.results[0].price;
+      } else if (response?.price) {
+        validPrice = response.price;
+      }
+
+      setValuesCached((prev) => {
+        return {
+          ...prev,
+          [symbol]: {
+            value: validPrice,
+            date: Date.now(),
+          },
+        };
+      });
+      return validPrice;
+    } catch (error) {
+      return 0;
+    }
   }
-}
+
   async function fillLines(lines: any, walletId: number) {
     lines.forEach((transaction: any) => {
       getPrice(transaction.symbol);
@@ -199,12 +207,12 @@ async function getPrice(symbol: string): Promise<number> {
     actualiseWallets(walletId);
     refreshWallets(walletId);
   }
+
   async function refreshWallets(walletId: number | null = null) {
-    let id = walletId;
-    if (walletId == null) id = selectedId;
+    const id = walletId ?? selectedIdRef.current;
     const userWallets = await fetch.get("/api/wallet");
     setWallets(userWallets);
-    actualiseWalletsLines(id as number, userWallets);
+    actualiseWalletsLines(id, userWallets);
   }
 
   useEffect(() => {
@@ -215,6 +223,7 @@ async function getPrice(symbol: string): Promise<number> {
     }, 4000);
     return () => clearInterval(interval);
   }, [isAuthenticated]);
+
   useEffect(() => {
     if (!isAuthenticated || !user) return;
     refreshWallets();
