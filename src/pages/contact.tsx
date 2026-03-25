@@ -7,7 +7,6 @@ import DashBoardLayout from "../components/layouts/DashBoard.layout";
 export default function Contact() {
   const [status, setStatus] = useState("");
 
-
   return (
     <>
       <Head>
@@ -25,7 +24,6 @@ export default function Contact() {
 
         <div className={contactStyles.contactGrid}>
           <div className={contactStyles.mainColumn}>
-
             <div className={contactStyles.formCard}>
               <h2 className={contactStyles.sectionTitle}>Nos Bureaux</h2>
               <div className={contactStyles.addressGrid}>
@@ -56,10 +54,24 @@ export default function Contact() {
             </div>
 
             <div className={contactStyles.infoBox}>
-              <h3>Communauté</h3>
+              <h3>Communauté Discord</h3>
               <p>Rejoignez les traders sur Discord pour une aide instantanée.</p>
               <a href="https://discord.gg/6sZcW7rEbu" target="_blank" rel="noreferrer" className={contactStyles.discordBtn}>
                 Ouvrir Discord
+              </a>
+            </div>
+
+            <div className={contactStyles.infoBox} >
+              <h3>Groupe WhatsApp</h3>
+              <p>Rejoignez notre groupe WhatsApp pour suivre les annonces en direct.</p>
+              <a 
+                href="https://chat.whatsapp.com/HlMP97vfI84HFcf4NpoPf5" 
+                target="_blank" 
+                rel="noreferrer" 
+                className={contactStyles.discordBtn}
+                style={{backgroundColor: '#25D366'}}
+              >
+                Rejoindre WhatsApp
               </a>
             </div>
           </div>
