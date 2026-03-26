@@ -111,7 +111,8 @@ async function transactionByWallet(req: Request, res: NextApiResponse<any>) {
   } else {
     const pendingCash = wallet.transactions.reduce((total: number, t: any) => {
       if (t.status === "PENDING" && !t.isSellOrder && t.id !== transaction.id) {
-        const reservedPrice = t.valueAtExecution || stock.price;
+        const reservedPrice = t.valueAtExecution || (t.symbol === symbol ? stock.price : 0);
+
         return total + (reservedPrice * t.quantity);
       }
       return total;
