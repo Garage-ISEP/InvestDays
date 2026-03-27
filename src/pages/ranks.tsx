@@ -128,6 +128,7 @@ const myPerformance = useMemo(() => {
                 {myPerformance
                   ? myPerformance.total.toLocaleString(undefined, {
                       minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
                     })
                   : "0.00"}{" "}
                 $
@@ -144,7 +145,7 @@ const myPerformance = useMemo(() => {
                 }}
               >
                 {myPerformance
-                  ? `${myPerformance.profit >= 0 ? "+" : ""}${myPerformance.profit.toLocaleString(undefined, { minimumFractionDigits: 2 })}`
+                  ? `${myPerformance.profit >= 0 ? "+" : ""}${myPerformance.profit.toLocaleString(undefined, { minimumFractionDigits: 2,maximumFractionDigits: 2,  })}`
                   : "0.00"}{" "}
                 $
               </div>

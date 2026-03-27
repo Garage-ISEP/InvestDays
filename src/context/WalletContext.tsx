@@ -52,6 +52,7 @@ const WalletContext = createContext<WalletContext>({
 });
 
 const WalletProvider = ({ children }: { children: any }) => {
+  const lastSyncRef = useRef<number>(0);
   const fetch = useFetch();
   const { isAuthenticated, user } = useAuthentification();
   const [wallets, setWallets] = useState<any[]>([]);
@@ -80,18 +81,26 @@ const WalletProvider = ({ children }: { children: any }) => {
     calculateAssets();
   }, [walletsLines, selectedId, valuesCached]);
 
-  function calculateAssets() {
-    let assetsValues = 0;
-    if (walletsLines && walletsLines[selectedId]) {
-      walletsLines[selectedId]?.forEach(
-        (line: { symbol: string; quantity: number }) => {
-          if (valuesCached[line.symbol])
-            assetsValues += line.quantity * valuesCached[line.symbol].value;
-        }
-      );
-      setAssetsCached(assetsValues);
+// Modifier calculateAssets()
+function calculateAssets() {
+  let assetsValues = 0;
+  if (walletsLines && walletsLines[selectedId]) {
+    walletsLines[selectedId]?.forEach(
+      (line: { symbol: string; quantity: number }) => {
+        if (valuesCached[line.symbol])
+          assetsValues += line.quantity * valuesCached[line.symbol].value;
+      }
+    );
+    setAssetsCached(assetsValues);
+
+    // ✅ Synchroniser avec la BDD
+    const cash = wallets[selectedId]?.cash || 0;
+    const totalValue = cash + assetsValues;
+    if (wallets[selectedId]?.id) {
+      syncPublicValue(selectedId, totalValue);
     }
   }
+}
 
   function actualiseWalletsLines(walletId: number, wallet: any) {
     let trans: any;
@@ -149,6 +158,7 @@ const WalletProvider = ({ children }: { children: any }) => {
     acc = acc.filter((item: any) => item.quantity > 0.000000001);
     return acc;
   }
+  
 
   async function getPrice(symbol: string): Promise<number> {
     try {
@@ -213,6 +223,22 @@ const WalletProvider = ({ children }: { children: any }) => {
     if (!isAuthenticated || !user) return;
     refreshWallets();
   }, [isAuthenticated]);
+
+  // Ajouter cette fonction dans WalletProvider
+async function syncPublicValue(walletId: number, totalValue: number) {
+  const now = Date.now();
+  if (now - lastSyncRef.current < 30000) return; // ✅ Max 1 sync toutes les 30s
+  lastSyncRef.current = now;
+
+  try {
+    await fetch.post("/api/wallet/updatePublicValue", {
+      walletId: wallets[walletId]?.id,
+      value: totalValue,
+    });
+  } catch (error) {
+    console.error("Erreur sync publicWalletValue:", error);
+  }
+}
 
   return (
     <WalletContext.Provider
