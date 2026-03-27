@@ -106,8 +106,8 @@ function Popup({
       selling: sell ? "true" : "false",
     };
 
-    if (sell && onSellConfirm) onSellConfirm(symbol); // 👈 disparition immédiate
-    close(); // 👈 ferme immédiatement
+if (sell && onSellConfirm) onSellConfirm(symbol, quantity, maxCount); 
+close();
 
     fetch
       .post("/api/transactions", payload)

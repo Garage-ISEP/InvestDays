@@ -85,10 +85,11 @@ function TableWallet({ selectedId, activeWalletTransactions, lang }) {
 
   const visibleLines = sortedLines.filter(item => !sellingSymbols.has(item.symbol));
 
-  function handleSellConfirm(symbol) {
+function handleSellConfirm(symbol, quantitySold, totalQuantity) {
+  if (quantitySold >= totalQuantity) {
     setSellingSymbols(prev => new Set(prev).add(symbol));
   }
-
+}
   function handleSort(key) {
     if (sortKey === key) {
       setSortDir(sortDir === "asc" ? "desc" : "asc");
