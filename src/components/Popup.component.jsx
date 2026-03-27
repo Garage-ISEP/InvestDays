@@ -14,8 +14,9 @@ function Popup({
   close,
   lang,
   isMarketOpen = true,
+  onSellConfirm, // 👈
 }) {
-  const { wallets, selectedId } = useWallet();
+  const { wallets, selectedId, actualiseWalletsLines } = useWallet();
   const [count, setCount] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const fetch = useFetch();
@@ -33,6 +34,7 @@ function Popup({
       successOrderPending: "Ordre créé — sera exécuté à l'ouverture du marché.",
       errOrder: "Erreur lors de l'ordre",
       marketClosed: "Marché fermé — l'ordre sera en attente d'exécution jusqu'à la réouverture.",
+      btn_sell_all: "Vendre tout",
     },
     en: {
       btnBuy: "Buy",
@@ -43,14 +45,15 @@ function Popup({
       successOrderPending: "Order created — will execute at market open.",
       errOrder: "Error during the order",
       marketClosed: "Market closed — the order will be pending until the market reopens.",
+      btn_sell_all: "Sell all",
     },
   };
   const t = translations[lang] || translations.fr;
 
-useEffect(() => {
-  setCount(0);
-  setIsLoading(false);
-}, [open, symbol]);
+  useEffect(() => {
+    setCount(0);
+    setIsLoading(false);
+  }, [open, symbol]);
 
   const increment = () => {
     setCount((prev) => {
@@ -83,46 +86,49 @@ useEffect(() => {
     }
   };
 
-const executeOrder = () => {
-  const quantity = Number(count);
-  if (quantity <= 0) {
-    toast.error(t.errQty, {
-      className: PopupStyles.toastError,
-      progressClassName: PopupStyles.toastProgressError,
-    });
-    return;
-  }
-
-  if (isLoading) return;
-  setIsLoading(true);
-
-  const payload = {
-    walletId: wallets[selectedId].id,
-    symbol: symbol,
-    amount: quantity.toFixed(precision),
-    selling: sell ? "true" : "false",
-  };
-
-  fetch
-    .post("/api/transactions", payload)
-    .then(() => {
-      const successMsg = isMarketOpen ? t.successOrder : t.successOrderPending;
-      toast.success(successMsg, {
-        className: PopupStyles.toastSuccess,
-        progressClassName: PopupStyles.toastProgressSuccess,
-      });
-      close();
-    })
-    .catch(() => {
-      toast.error(t.errOrder, {
+  const executeOrder = () => {
+    const quantity = Number(count);
+    if (quantity <= 0) {
+      toast.error(t.errQty, {
         className: PopupStyles.toastError,
         progressClassName: PopupStyles.toastProgressError,
       });
-    })
-    .finally(() => {
-      setIsLoading(false);
-    });
-};
+      return;
+    }
+
+    if (isLoading) return;
+    setIsLoading(true);
+
+    const payload = {
+      walletId: wallets[selectedId].id,
+      symbol: symbol,
+      amount: quantity.toFixed(precision),
+      selling: sell ? "true" : "false",
+    };
+
+    if (sell && onSellConfirm) onSellConfirm(symbol); // 👈 disparition immédiate
+    close(); // 👈 ferme immédiatement
+
+    fetch
+      .post("/api/transactions", payload)
+      .then(() => {
+        const successMsg = isMarketOpen ? t.successOrder : t.successOrderPending;
+        toast.success(successMsg, {
+          className: PopupStyles.toastSuccess,
+          progressClassName: PopupStyles.toastProgressSuccess,
+        });
+        actualiseWalletsLines();
+      })
+      .catch(() => {
+        toast.error(t.errOrder, {
+          className: PopupStyles.toastError,
+          progressClassName: PopupStyles.toastProgressError,
+        });
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
 
   if (!open) return null;
 
@@ -131,36 +137,30 @@ const executeOrder = () => {
       <div className={PopupStyles.modal}>
         <div className={PopupStyles.modalContent}>
           <div className={PopupStyles.modalTitle}>
-            <h1>
-              {title} : {symbol}
-            </h1>
+            <h1>{title} : {symbol}</h1>
             <span className={PopupStyles.modalSubtitle}>{subtitle}</span>
           </div>
 
           {!isMarketOpen && (
-            <div
-              style={{
-                background: "#fff8e1",
-                border: "1px solid #f3ca3e",
-                borderRadius: "8px",
-                padding: "10px 14px",
-                fontSize: "12px",
-                color: "#7a5f00",
-                marginBottom: "16px",
-                display: "flex",
-                alignItems: "flex-start",
-                gap: "8px",
-              }}
-            >
+            <div style={{
+              background: "#fff8e1",
+              border: "1px solid #f3ca3e",
+              borderRadius: "8px",
+              padding: "10px 14px",
+              fontSize: "12px",
+              color: "#7a5f00",
+              marginBottom: "16px",
+              display: "flex",
+              alignItems: "flex-start",
+              gap: "8px",
+            }}>
               <span style={{ fontSize: "14px", flexShrink: 0 }}>⏳</span>
               <span>{t.marketClosed}</span>
             </div>
           )}
 
           <div className={PopupStyles.inputNumberWrapper}>
-            <button className={PopupStyles.decrease} onClick={decrement}>
-              -
-            </button>
+            <button className={PopupStyles.decrease} onClick={decrement}>-</button>
             <input
               type="number"
               step={step}
@@ -174,18 +174,26 @@ const executeOrder = () => {
                 setCount(n.toFixed(precision));
               }}
             />
-            <button className={PopupStyles.increase} onClick={increment}>
-              +
-            </button>
+            <button className={PopupStyles.increase} onClick={increment}>+</button>
           </div>
-<button 
-  className={PopupStyles.buttonBuy} 
-  onClick={executeOrder}
-  disabled={isLoading}
-  style={{ opacity: isLoading ? 0.6 : 1, cursor: isLoading ? 'not-allowed' : 'pointer' }}
->
-  {isLoading ? "..." : (sell ? t.btnSell : t.btnBuy)}
-</button>
+
+          {sell && (
+            <button
+              className={PopupStyles.sellAllLink}
+              onClick={() => setCount(Number(maxCount).toFixed(precision))}
+            >
+              {t.btn_sell_all}
+            </button>
+          )}
+
+          <button
+            className={PopupStyles.buttonBuy}
+            onClick={executeOrder}
+            disabled={isLoading}
+            style={{ opacity: isLoading ? 0.6 : 1, cursor: isLoading ? 'not-allowed' : 'pointer' }}
+          >
+            {isLoading ? "..." : (sell ? t.btnSell : t.btnBuy)}
+          </button>
         </div>
 
         <div className={PopupStyles.modalFooter}>

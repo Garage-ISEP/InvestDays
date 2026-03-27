@@ -9,6 +9,7 @@ function TableWallet({ selectedId, activeWalletTransactions, lang }) {
   const [isOpen, setIsOpen] = useState(false);
   const [sortKey, setSortKey] = useState(null);
   const [sortDir, setSortDir] = useState("asc");
+  const [sellingSymbols, setSellingSymbols] = useState(new Set());
   const { walletsLines, actualiseWalletsLines, valuesCached } = useWallet();
 
   const translations = {
@@ -22,8 +23,6 @@ function TableWallet({ selectedId, activeWalletTransactions, lang }) {
       h_gain: "Gain",
       h_action: "Action",
       btn_sell: "Vendre",
-      pop_title: "Vendre",
-      pop_sub: "Vendre"
     },
     en: {
       h_symbol: "Symbol",
@@ -35,8 +34,6 @@ function TableWallet({ selectedId, activeWalletTransactions, lang }) {
       h_gain: "Profit",
       h_action: "Action",
       btn_sell: "Sell",
-      pop_title: "Sell",
-      pop_sub: "Sell"
     }
   };
 
@@ -46,7 +43,6 @@ function TableWallet({ selectedId, activeWalletTransactions, lang }) {
     if (!(walletsLines && walletsLines[selectedId])) actualiseWalletsLines();
   }, [activeWalletTransactions]);
 
-  // Calcul des données enrichies pour le tri
   const enrichedLines = (walletsLines?.[selectedId] || []).map((item) => {
     const value = valuesCached?.[item.symbol]?.value;
     if (value == null) return null;
@@ -76,7 +72,6 @@ function TableWallet({ selectedId, activeWalletTransactions, lang }) {
     };
   }).filter(Boolean);
 
-  // Tri
   const sortedLines = [...enrichedLines].sort((a, b) => {
     if (!sortKey) return 0;
     let valA = a[sortKey];
@@ -87,6 +82,12 @@ function TableWallet({ selectedId, activeWalletTransactions, lang }) {
     if (valA > valB) return sortDir === "asc" ? 1 : -1;
     return 0;
   });
+
+  const visibleLines = sortedLines.filter(item => !sellingSymbols.has(item.symbol));
+
+  function handleSellConfirm(symbol) {
+    setSellingSymbols(prev => new Set(prev).add(symbol));
+  }
 
   function handleSort(key) {
     if (sortKey === key) {
@@ -140,7 +141,7 @@ function TableWallet({ selectedId, activeWalletTransactions, lang }) {
           </tr>
         </thead>
         <tbody>
-          {sortedLines.map((item, index) => {
+          {visibleLines.map((item, index) => {
             const isPositive = item.variation >= 0;
             return (
               <tr key={index} className={TableTransactionStyles.tr}>
@@ -192,6 +193,7 @@ function TableWallet({ selectedId, activeWalletTransactions, lang }) {
         open={isOpen}
         close={() => setIsOpen(false)}
         lang={lang}
+        onSellConfirm={handleSellConfirm}
       />
     </>
   );

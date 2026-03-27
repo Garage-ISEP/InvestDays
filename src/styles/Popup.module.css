@@ -240,3 +240,33 @@
   font-family: 'Inter', sans-serif !important;
   font-size: 0.95rem !important;
 }
+
+/* ─────────────────────────────────────────
+   BOUTON VENDRE TOUT
+───────────────────────────────────────── */
+.sellAllLink {
+  background: none;
+  border: 1px solid #ef4444;
+  color: #ef4444;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  border-radius: 10px;
+  padding: 6px 14px;
+  margin-top: -10px;
+  margin-bottom: 8px;
+  letter-spacing: 0.3px;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+}
+
+.sellAllLink:hover {
+  background-color: #ef4444;
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(239, 68, 68, 0.25);
+}
+
+.sellAllLink:active {
+  transform: translateY(0px);
+}
