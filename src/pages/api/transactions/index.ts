@@ -91,18 +91,25 @@ async function transactionByWallet(req: Request, res: NextApiResponse<any>) {
     wallet.id as number
   );
 
-  if (selling === "true") {
-    let ownedQuantity = 0;
-    wallet.transactions.forEach((t: any) => {
-      if (t.symbol === symbol && t.status === "EXECUTED") {
-        ownedQuantity += (t.isSellOrder ? -1 : 1) * t.quantity;
-      }
-    });
+if (selling === "true") {
+  let ownedQuantity = 0;
+  let pendingSellQuantity = 0; 
 
-    if (ownedQuantity < parseFloat(amount)) {
-      await transactionsService.updateStatus(transaction.id, Status.FAILED);
-      throw "Not enough stocks to sell";
+  wallet.transactions.forEach((t: any) => {
+    if (t.symbol === symbol && t.status === "EXECUTED") {
+      ownedQuantity += (t.isSellOrder ? -1 : 1) * t.quantity;
     }
+    if (t.symbol === symbol && t.status === "PENDING" && t.isSellOrder && t.id !== transaction.id) {
+      pendingSellQuantity += t.quantity;
+    }
+  });
+
+  const effectivelyAvailable = ownedQuantity - pendingSellQuantity; 
+
+  if (effectivelyAvailable < parseFloat(amount)) {
+    await transactionsService.updateStatus(transaction.id, Status.FAILED);
+    throw "Not enough stocks to sell";
+  }
 
     if (isMarketOpen) {
       await transactionsService.executeTransaction(transaction, stock.price);
