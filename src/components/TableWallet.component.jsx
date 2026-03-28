@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import TableTransactionStyles from "../styles/TableTransaction.module.css";
 import { useWallet } from "../context/WalletContext";
 import Popup from "./Popup.component";
-
+import { toast } from "react-toastify"; 
 function TableWallet({ selectedId, activeWalletTransactions, lang }) {
   const [symbol, setSymbol] = useState("");
   const [maxCount, setMaxCount] = useState(0);
@@ -11,6 +11,24 @@ function TableWallet({ selectedId, activeWalletTransactions, lang }) {
   const [sortDir, setSortDir] = useState("asc");
   const [sellingSymbols, setSellingSymbols] = useState(new Set());
   const { walletsLines, actualiseWalletsLines, valuesCached } = useWallet();
+
+  const infoIconStyle = {
+    marginLeft: '8px',
+    cursor: 'pointer',
+    fontSize: '0.7rem',
+    color: '#3498db',
+    border: '1px solid #3498db',
+    borderRadius: '50%',
+    width: '16px',
+    height: '16px',
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    verticalAlign: 'middle',
+    fontWeight: 'bold',
+    backgroundColor: '#ebf5fb',
+    transition: 'transform 0.1s ease'
+  };
 
   const translations = {
     fr: {
@@ -23,6 +41,11 @@ function TableWallet({ selectedId, activeWalletTransactions, lang }) {
       h_gain: "Gain",
       h_action: "Action",
       btn_sell: "Vendre",
+      pop_title: "Vendre des actions",
+      pop_sub: "Confirmez la vente pour",
+      h_var_dollar_info: "Variation de la valeur par action par rapport au prix d'achat moyen.",
+      h_var_percent_info: "Performance en pourcentage depuis l'achat.",
+      h_gain_info: "Gain ou perte totale latente (Variation $ × Quantité).",
     },
     en: {
       h_symbol: "Symbol",
@@ -34,14 +57,32 @@ function TableWallet({ selectedId, activeWalletTransactions, lang }) {
       h_gain: "Profit",
       h_action: "Action",
       btn_sell: "Sell",
+      pop_title: "Sell Stocks",
+      pop_sub: "Confirm sale for",
+      h_var_dollar_info: "Price variation per share compared to the average buy price.",
+      h_var_percent_info: "Percentage performance since purchase.",
+      h_gain_info: "Total unrealized profit or loss (Var $ × Quantity).",
     }
   };
 
   const t = translations[lang] || translations.fr;
 
+  // Fonction pour afficher l'explication au clic
+  const showInfo = (e, text) => {
+    e.stopPropagation(); // Empêche le tri de la colonne lors du clic sur l'icône
+    toast.info(text, {
+      position: "bottom-right",
+      autoClose: 4000,
+      hideProgressBar: true,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+    });
+  };
+
   useEffect(() => {
     if (!(walletsLines && walletsLines[selectedId])) actualiseWalletsLines();
-  }, [activeWalletTransactions]);
+  }, [activeWalletTransactions, selectedId]);
 
   const enrichedLines = (walletsLines?.[selectedId] || []).map((item) => {
     const value = valuesCached?.[item.symbol]?.value;
@@ -85,11 +126,12 @@ function TableWallet({ selectedId, activeWalletTransactions, lang }) {
 
   const visibleLines = sortedLines.filter(item => !sellingSymbols.has(item.symbol));
 
-function handleSellConfirm(symbol, quantitySold, totalQuantity) {
-  if (quantitySold >= totalQuantity) {
-    setSellingSymbols(prev => new Set(prev).add(symbol));
+  function handleSellConfirm(symbol, quantitySold, totalQuantity) {
+    if (quantitySold >= totalQuantity) {
+      setSellingSymbols(prev => new Set(prev).add(symbol));
+    }
   }
-}
+
   function handleSort(key) {
     if (sortKey === key) {
       setSortDir(sortDir === "asc" ? "desc" : "asc");
@@ -127,15 +169,43 @@ function handleSellConfirm(symbol, quantitySold, totalQuantity) {
             <th className={TableTransactionStyles.th} style={thStyle} onClick={() => handleSort("value")}>
               {t.h_current}<SortIcon colKey="value" />
             </th>
+            
+            {/* Colonne Var $ */}
             <th className={TableTransactionStyles.th} style={thStyle} onClick={() => handleSort("variation")}>
-              {t.h_var_dollar}<SortIcon colKey="variation" />
+              {t.h_var_dollar}
+              <span 
+                className={TableTransactionStyles.infoIcon} 
+                onClick={(e) => showInfo(e, t.h_var_dollar_info)}
+              >
+                i
+              </span>
+              <SortIcon colKey="variation" />
             </th>
+
+            {/* Colonne Var % */}
             <th className={TableTransactionStyles.th} style={thStyle} onClick={() => handleSort("variationPercent")}>
-              {t.h_var_percent}<SortIcon colKey="variationPercent" />
+              {t.h_var_percent}
+              <span 
+                className={TableTransactionStyles.infoIcon} 
+                onClick={(e) => showInfo(e, t.h_var_percent_info)}
+              >
+                i
+              </span>
+              <SortIcon colKey="variationPercent" />
             </th>
+
+            {/* Colonne Gain */}
             <th className={TableTransactionStyles.th} style={thStyle} onClick={() => handleSort("gain")}>
-              {t.h_gain}<SortIcon colKey="gain" />
+              {t.h_gain}
+              <span 
+                className={TableTransactionStyles.infoIcon} 
+                onClick={(e) => showInfo(e, t.h_gain_info)}
+              >
+                i
+              </span>
+              <SortIcon colKey="gain" />
             </th>
+
             <th className={TableTransactionStyles.th}>
               {t.h_action}
             </th>

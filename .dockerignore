@@ -11,3 +11,10 @@ Dockerfile
 docker-compose.yml
 .env.local
 /node_modules
+
+node_modules
+.next
+.git
+db_data
+db_data_dev
+.env

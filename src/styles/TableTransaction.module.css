@@ -167,11 +167,42 @@
 }
 
 .currentUserRow {
-  background-color: #ffeaa7 !important; /* Votre couleur jaune */
+  background-color: #ffeaa7 !important;
   color: #000 !important;
 }
 
 .currentUserRow td {
   color: #000 !important;
   font-weight: 700;
+}
+
+.infoIcon {
+  margin-left: 8px;
+  cursor: pointer;
+  font-size: 0.7rem;
+  color: #3498db;
+  border: 1px solid #3498db;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+  font-weight: bold;
+  background-color: #ebf5fb;
+  transition: transform 0.1s ease;
+  text-transform: none;
+  letter-spacing: normal; 
+}
+
+.infoIcon:hover {
+  transform: scale(1.2);
+  background-color: #d6eaf8;
+}
+
+@media screen and (max-width: 750px) {
+  .infoIcon {
+    display: none;
+  }
 }
