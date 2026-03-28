@@ -130,7 +130,6 @@ async function fetchData(symbol: string, marketParam?: string) {
   try {
     const m = marketParam || "stocks";
     const res = await fetch.get(`/api/stock/info?symbol=${symbol}&market=${m}&range=ALL`);
-    console.log("fetchData response:", JSON.stringify(res));  // ← ajoutez ça
     setData(res || { results: [] });
   } catch (e) {
     setData({ results: [] });
