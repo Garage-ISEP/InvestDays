@@ -64,6 +64,7 @@ const POPULAR_FRANCE = [
   { symbol: "AIR.PA",   name: "Airbus",                        market: "france" },
   { symbol: "BNP.PA",   name: "BNP Paribas",                   market: "france" },
   { symbol: "DSY.PA",   name: "Dassault Systèmes",             market: "france" },
+  { symbol: "AM.PA",   name: "Dassault Aviation",              market: "france" },
   { symbol: "KER.PA",   name: "Kering",                        market: "france" },
   { symbol: "CS.PA",    name: "AXA",                           market: "france" },
   { symbol: "SAF.PA",   name: "Safran",                        market: "france" },
@@ -115,7 +116,17 @@ const POPULAR_FRANCE = [
   { symbol: "ABNX.PA",  name: "Abionyx Pharma",                market: "france" },
   { symbol: "ABVX.PA",  name: "Abivax",                        market: "france" },
   { symbol: "ADOC.PA",  name: "Adocia",                        market: "france" },
-  { symbol: "AF.PA",  name: "Air France-KLM",                        market: "france" },
+  { symbol: "AF.PA",    name: "Air France-KLM",                market: "france" },
+  { symbol: "VU.PA",    name: "Vusion",                        market: "france" },
+  { symbol: "BVI.PA",   name: "Bureau Veritas",                market: "france" },
+  { symbol: "FGR.PA",   name: "Eiffage",                       market: "france" },  
+  { symbol: "STLAP.PA", name: "Stellantis",                    market: "france" },
+  { symbol: "ERF.PA",   name: "Eurofins Scientific",           market: "france" },
+  { symbol: "ENX.PA",   name: "Euronext",                      market: "france" },
+  { symbol: "ARAMI.PA", name: "Aramis Group SA",               market: "france" },
+  { symbol: "CA.PA",    name: "Carrefour",                     market: "france" },
+  { symbol: "ATE.PA",   name: "Alten",                         market: "france" },
+  { symbol: "ANTIN.PA", name: "Antin Infrastructure Partners", market: "france" },
 ];
 
 const POPULAR_FOREX = [
