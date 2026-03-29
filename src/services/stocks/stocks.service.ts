@@ -323,7 +323,7 @@ async function getRecentPrices(
   const formatted = formatSymbol(symbol, type);
 
   try {
-    const url = `https://api.finage.co.uk/agg/${segment}/${formatted}/${multiplier}/${timespan}/${from}/${to}?limit=2000&sort=asc&apikey=${FINAGE_API_KEY}`;
+    const url = `https://api.finage.co.uk/agg/${segment}/${formatted}/${multiplier}/${timespan}/${from}/${to}?limit=5000&sort=asc&apikey=${FINAGE_API_KEY}`;
     const res = await fetch(url);
     const data = await res.json();
     return { results: data.results || [] };
