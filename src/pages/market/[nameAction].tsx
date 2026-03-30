@@ -316,7 +316,6 @@ useEffect(() => {
 
 
         <Popup
-          title={t.popTitle}
           subtitle={`${t.popSub} ${nameAction}`}
           maxCount={detail?.price ? (wallets[selectedId]?.cash || 0) / detail.price : 0}
           symbol={nameAction as string}
