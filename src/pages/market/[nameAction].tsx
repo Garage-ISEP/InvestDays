@@ -16,6 +16,17 @@ import { useAuthentification } from "../../context/AuthContext";
 type TimeRange = "1H" | "1D" | "1W" | "1M" | "ALL";
 
 
+function isEuronextOpen(): boolean {
+  const now = new Date();
+  const parisTime = new Date(now.toLocaleString("en-US", { timeZone: "Europe/Paris" }));
+  const day = parisTime.getDay();
+  const hours = parisTime.getHours();
+  const minutes = parisTime.getMinutes();
+  const timeInMinutes = hours * 60 + minutes;
+  if (day === 0 || day === 6) return false;
+  return timeInMinutes >= 540 && timeInMinutes < 1050;
+}
+
 function isNYSEOpen(): boolean {
   const now = new Date();
   const nyTime = new Date(now.toLocaleString("en-US", { timeZone: "America/New_York" }));
@@ -93,38 +104,40 @@ const chartData = useMemo(() => {
   return { line, candle };
 }, [data, detail?.price]);
 
-  async function fetchDetail(symbol: string) {
-    try {
-      const response = await fetch.get("/api/stock/detail?symbol=" + symbol);
-      const price = await getPrice(symbol);
-      const lastPriceRes = await fetch.get("/api/stock/lastPrice?symbol=" + symbol);
+async function fetchDetail(symbol: string) {
+  try {
+    const response = await fetch.get("/api/stock/detail?symbol=" + symbol);
+    const price = await getPrice(symbol);
+    const lastPriceRes = await fetch.get("/api/stock/lastPrice?symbol=" + symbol);
 
-      
-      const symbolUpper = symbol.toUpperCase();
-      const forexPairs = ['EURUSD', 'USDJPY', 'GBPUSD', 'USDCHF', 'AUDUSD', 'USDCAD', 'NZDUSD', 'EURJPY', 'GBPJPY', 'EURGBP'];
+    const symbolUpper = symbol.toUpperCase();
+    const forexPairs = ['EURUSD', 'USDJPY', 'GBPUSD', 'USDCHF', 'AUDUSD', 'USDCAD', 'NZDUSD', 'EURJPY', 'GBPJPY', 'EURGBP'];
+    const europeanSuffixes = ['.PA', '.AS', '.BR', '.MI', '.MC', '.DE', '.L', '.SW'];
 
-      const isForex = (market === "forex") || (market === "forex-fx") || forexPairs.includes(symbolUpper);
-      const isCrypto = (market === "crypto") || (symbolUpper.endsWith("USD") && !forexPairs.includes(symbolUpper));
+    const isForex = (market === "forex") || (market === "forex-fx") || forexPairs.includes(symbolUpper);
+    const isCrypto = (market === "crypto") || (symbolUpper.endsWith("USD") && !forexPairs.includes(symbolUpper));
+    const isEuropean = europeanSuffixes.some(suffix => symbolUpper.endsWith(suffix));
 
-      let finalStatus = "closed";
-      if (isCrypto) {
-        finalStatus = "open";
-      } else if (isForex) {
-        finalStatus = isForexOpen() ? "open" : "closed";
-      } else {
-        finalStatus = lastPriceRes?.results?.[0]?.market_status || (isNYSEOpen() ? "open" : "closed");
-      }
-
-      setDetail({
-        ...response.results,
-        price,
-        market_status: finalStatus
-      });
-    } catch (e) {
-      console.error("Erreur dans fetchDetail", e);
+    let finalStatus = "closed";
+    if (isCrypto) {
+      finalStatus = "open";
+    } else if (isForex) {
+      finalStatus = isForexOpen() ? "open" : "closed";
+    } else if (isEuropean) {
+      finalStatus = lastPriceRes?.results?.[0]?.market_status || (isEuronextOpen() ? "open" : "closed");
+    } else {
+      finalStatus = lastPriceRes?.results?.[0]?.market_status || (isNYSEOpen() ? "open" : "closed");
     }
-  }
 
+    setDetail({
+      ...response.results,
+      price,
+      market_status: finalStatus
+    });
+  } catch (e) {
+    console.error("Erreur dans fetchDetail", e);
+  }
+}
 async function fetchData(symbol: string, marketParam?: string) {
   setLoadingChart(true);
   try {
