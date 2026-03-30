@@ -8,6 +8,16 @@ import transactionsService from "../../../services/transactions/transactions.ser
 import walletsService from "../../../services/wallets/wallets.service";
 
 export default apiHandler(transactionByWallet);
+function isEuronextOpen(): boolean {
+  const now = new Date();
+  const parisTime = new Date(now.toLocaleString("en-US", { timeZone: "Europe/Paris" }));
+  const day = parisTime.getDay();
+  const hours = parisTime.getHours();
+  const minutes = parisTime.getMinutes();
+  const timeInMinutes = hours * 60 + minutes;
+  if (day === 0 || day === 6) return false;
+  return timeInMinutes >= 540 && timeInMinutes < 1050; // 9h00 - 17h30
+}
 
 async function transactionByWallet(req: Request, res: NextApiResponse<any>) {
   if (req.method !== "POST") {
@@ -70,18 +80,20 @@ async function transactionByWallet(req: Request, res: NextApiResponse<any>) {
   const isForex = (market === "forex" || market === "forex-fx" || forexPairs.includes(symbolUpper));
   const isCrypto = (market === "crypto") || (symbolUpper.endsWith("USD") && !forexPairs.includes(symbolUpper));
 
-  let isMarketOpen = false;
+const europeanSuffixes = ['.PA', '.AS', '.BR', '.MI', '.MC', '.DE', '.L', '.SW'];
+const isEuropean = europeanSuffixes.some(suffix => symbolUpper.endsWith(suffix));
 
-  if (isCrypto) {
-    isMarketOpen = true; 
-  } else if (isForex) {
-    isMarketOpen = isForexOpen();
-  } else {
-    isMarketOpen = isNYSEOpen();
-  }
+let isMarketOpen = false;
 
-  console.log(`🔍 Marché: ${market} | Symbole: ${symbol} | Ouvert: ${isMarketOpen}`);
-
+if (isCrypto) {
+  isMarketOpen = true;
+} else if (isForex) {
+  isMarketOpen = isForexOpen();
+} else if (isEuropean) {
+  isMarketOpen = isEuronextOpen();
+} else {
+  isMarketOpen = isNYSEOpen();
+}
   if (!wallet.id) throw new Error("Wallet ID missing");
 
   const transaction = await transactionsService.create(
