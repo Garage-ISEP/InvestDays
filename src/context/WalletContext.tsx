@@ -62,9 +62,9 @@ const WalletProvider = ({ children }: { children: any }) => {
     return parseInt(localStorage.getItem("selectedWalletId") || "0", 10);
   });
   const [assetsCached, setAssetsCached] = useState(0);
-  const [valuesCached, setValuesCached] = useState<{
-    [key: string]: { value: number; date: number };
-  }>({});
+const [valuesCached, setValuesCached] = useState<{
+  [key: string]: { value: number; date: number; market_status?: string };
+}>({});
 
   const valuesCachedRef = useRef(valuesCached);
   valuesCachedRef.current = valuesCached;
@@ -160,34 +160,35 @@ function calculateAssets() {
   }
   
 
-  async function getPrice(symbol: string): Promise<number> {
-    try {
-      if (
-        valuesCachedRef.current[symbol] &&
-        valuesCachedRef.current[symbol].date > Date.now() - 5000
-      ) {
-        return valuesCachedRef.current[symbol].value;
-      }
+async function getPrice(symbol: string): Promise<number> {
+  try {
+    const cached = valuesCachedRef.current[symbol];
 
-      const response: any = await fetch.get("/api/stock/lastPrice?symbol=" + symbol);
-      let validPrice = 0;
-      if (typeof response === "number") {
-        validPrice = response;
-      } else if (response?.results?.length > 0 && response.results[0].price) {
-        validPrice = response.results[0].price;
-      } else if (response?.price) {
-        validPrice = response.price;
-      }
-
-      setValuesCached((prev) => ({
-        ...prev,
-        [symbol]: { value: validPrice, date: Date.now() },
-      }));
-      return validPrice;
-    } catch (error) {
-      return 0;
+    // Si marché fermé et prix déjà en cache → on ne refetch pas
+    if (cached?.market_status === "closed" && cached?.value) {
+      return cached.value;
     }
+
+    // Cache court (5s) si marché ouvert
+    if (cached && cached.date > Date.now() - 5000) {
+      return cached.value;
+    }
+
+    const response: any = await fetch.get("/api/stock/lastPrice?symbol=" + symbol);
+
+    const validPrice = response?.price || 0;
+    const marketStatus = response?.market_status ?? "closed";
+
+    setValuesCached((prev) => ({
+      ...prev,
+      [symbol]: { value: validPrice || cached?.value || 0, date: Date.now(), market_status: marketStatus },
+    }));
+
+    return validPrice || cached?.value || 0;
+  } catch (error) {
+    return 0;
   }
+}
 
   async function fillLines(lines: any, walletId: number) {
     lines.forEach((transaction: any) => {

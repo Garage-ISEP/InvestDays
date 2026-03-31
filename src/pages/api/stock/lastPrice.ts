@@ -20,17 +20,22 @@ async function lastPrice(req: Request, res: NextApiResponse<any>) {
   }
 
   try {
-const resp: any = await stocksService.getLastPrice(
-  symbol.toUpperCase(),
-  req.auth.sub,
-  clientIp as string,
-  marketHint
-);
+    const resp: any = await stocksService.getLastPrice(
+      symbol.toUpperCase(),
+      req.auth.sub,
+      clientIp as string,
+      marketHint
+    );
 
     const price = resp?.results?.[0]?.price;
+    const marketStatus = resp?.results?.[0]?.market_status ?? "closed";
 
-    return res.status(200).json(price ? Number(price) : 0);
+    return res.status(200).json({
+      price: price ? Number(price) : 0,
+      market_status: marketStatus,
+    });
+
   } catch (error) {
-    return res.status(200).json(0);
+    return res.status(200).json({ price: 0, market_status: "closed" });
   }
 }

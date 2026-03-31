@@ -125,8 +125,10 @@ const chartData = useMemo(() => {
 async function fetchDetail(symbol: string) {
   try {
     const response = await fetch.get("/api/stock/detail?symbol=" + symbol);
-    const price = await getPrice(symbol);
     const lastPriceRes = await fetch.get("/api/stock/lastPrice?symbol=" + symbol);
+
+    const lastPrice = lastPriceRes?.price || 0;
+    const lastMarketStatus = lastPriceRes?.market_status ?? "closed";
 
     const symbolUpper = symbol.toUpperCase();
     const forexPairs = ['EURUSD', 'USDJPY', 'GBPUSD', 'USDCHF', 'AUDUSD', 'USDCAD', 'NZDUSD', 'EURJPY', 'GBPJPY', 'EURGBP'];
@@ -142,16 +144,18 @@ async function fetchDetail(symbol: string) {
     } else if (isForex) {
       finalStatus = isForexOpen() ? "open" : "closed";
     } else if (isEuropean) {
-      finalStatus = lastPriceRes?.results?.[0]?.market_status || (isEuronextOpen() ? "open" : "closed");
+      finalStatus = lastMarketStatus || (isEuronextOpen() ? "open" : "closed");
     } else {
-      finalStatus = lastPriceRes?.results?.[0]?.market_status || (isNYSEOpen() ? "open" : "closed");
+      finalStatus = lastMarketStatus || (isNYSEOpen() ? "open" : "closed");
     }
 
-    setDetail({
+    // Marché fermé → on ne met pas à jour le prix si on en a déjà un
+    setDetail((prev: any) => ({
       ...response.results,
-      price,
-      market_status: finalStatus
-    });
+      price: finalStatus === "closed" && prev?.price ? prev.price : (lastPrice || prev?.price || 0),
+      market_status: finalStatus,
+    }));
+
   } catch (e) {
     console.error("Erreur dans fetchDetail", e);
   }
@@ -178,11 +182,12 @@ useEffect(() => {
 
 useEffect(() => {
   if (!nameAction) return;
+  const delay = detail?.market_status === "closed" ? 60000 : 5000;
   const interval = setInterval(() => {
     fetchDetail(nameAction as string);
-  }, 5000); 
+  }, delay);
   return () => clearInterval(interval);
-}, [nameAction]);
+}, [nameAction, detail?.market_status]);
 
   const handleRangeChange = (newRange: TimeRange) => {
     setRange(newRange);
