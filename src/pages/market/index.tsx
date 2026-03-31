@@ -490,7 +490,7 @@ const displayList = rawList
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div className={marketStyles.marketStatusContainer}>
               {[
-                { label: t.filterStocks, info: lang === 'fr' ? '15h30 – 21h00' : '3:30 PM – 9:00 PM' },
+                { label: t.filterStocks, info: lang === 'fr' ? '15h30 – 22h00' : '3:30 PM – 9:00 PM' },
                 { label: t.filterFrance, info: lang === 'fr' ? '09h00 – 17h30' : '9:00 AM – 5:30 PM' },
                 { label: t.filterForex,  info: lang === 'fr' ? 'Lun – Ven'     : 'Mon – Fri' },
                 { label: t.filterCrypto, info: '24/7' },
