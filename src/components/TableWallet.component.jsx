@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import TableTransactionStyles from "../styles/TableTransaction.module.css";
 import { useWallet } from "../context/WalletContext";
 import Popup from "./Popup.component";
@@ -11,10 +11,14 @@ function TableWallet({ selectedId, activeWalletTransactions, lang }) {
   const [sortKey, setSortKey] = useState(null);
   const [sortDir, setSortDir] = useState("asc");
   const [sellingSymbols, setSellingSymbols] = useState(new Set());
+
   const [sellCooldown, setSellCooldown] = useState(false);
   const [cooldownSeconds, setCooldownSeconds] = useState(0);
+  const timerRef = useRef(null);
 
   const { walletsLines, actualiseWalletsLines, valuesCached } = useWallet();
+
+  const COOLDOWN_STORAGE_KEY = "sell_cooldown_end_time";
 
   const translations = {
     fr: {
@@ -52,6 +56,57 @@ function TableWallet({ selectedId, activeWalletTransactions, lang }) {
   };
 
   const t = translations[lang] || translations.fr;
+
+
+  const runTimer = (endTime) => {
+    if (timerRef.current) clearInterval(timerRef.current);
+
+    setSellCooldown(true);
+
+    timerRef.current = setInterval(() => {
+      const now = Date.now();
+      const remaining = Math.ceil((endTime - now) / 1000);
+
+      if (remaining <= 0) {
+        clearInterval(timerRef.current);
+        setSellCooldown(false);
+        setCooldownSeconds(0);
+        localStorage.removeItem(COOLDOWN_STORAGE_KEY);
+      } else {
+        setCooldownSeconds(remaining);
+      }
+    }, 1000);
+  };
+
+  useEffect(() => {
+    const savedEndTime = localStorage.getItem(COOLDOWN_STORAGE_KEY);
+    if (savedEndTime) {
+      const endTime = parseInt(savedEndTime, 10);
+      const now = Date.now();
+
+      if (endTime > now) {
+        const remainingInitial = Math.ceil((endTime - now) / 1000);
+        setCooldownSeconds(remainingInitial);
+        runTimer(endTime);
+      } else {
+        localStorage.removeItem(COOLDOWN_STORAGE_KEY);
+      }
+    }
+
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, []);
+
+  function startSellCooldown() {
+    const durationMs = 15000;
+    const endTime = Date.now() + durationMs;
+    
+    localStorage.setItem(COOLDOWN_STORAGE_KEY, endTime.toString());
+    setCooldownSeconds(20);
+    runTimer(endTime);
+  }
+
 
   const showInfo = (e, text) => {
     e.stopPropagation();
@@ -113,21 +168,6 @@ function TableWallet({ selectedId, activeWalletTransactions, lang }) {
     if (quantitySold >= totalQuantity) {
       setSellingSymbols((prev) => new Set(prev).add(symbol));
     }
-  }
-
-  function startSellCooldown() {
-    setSellCooldown(true);
-    setCooldownSeconds(20);
-    const interval = setInterval(() => {
-      setCooldownSeconds((prev) => {
-        if (prev <= 1) {
-          clearInterval(interval);
-          setSellCooldown(false);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
   }
 
   function handleSort(key) {
