@@ -45,7 +45,7 @@ function TableRanks({ data = [], userId, lang }) {
   }, []);
 
   const allRanked = bestWalletsPerUser
-    .filter((item) => item?.user?.isAdmin === false)
+    .filter((item) => item?.user?.isAdmin === false && item?.user?.isPartenaire === false)
     .sort((a, b) => (Number(b.publicWalletValue) || 0) - (Number(a.publicWalletValue) || 0));
 
   if (!allRanked.length) {
@@ -96,7 +96,7 @@ if (myIndex >= 10) {
             );
           }
 
-          const globalRank = allRanked.findIndex(orig => orig.id === item.id) + 1;
+          const globalRank = allRanked.findIndex(orig => String(orig.user?.id) === String(item.user?.id)) + 1;
           const medals = ["🥇", "🥈", "🥉"];
           const totalValue = Number(item.publicWalletValue) || 0;
           const isMe = item.user?.id === userId;
