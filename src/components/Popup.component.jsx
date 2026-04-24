@@ -134,74 +134,7 @@ close();
 
   return (
     <div className={PopupStyles.modalBackdrop}>
-      <div className={PopupStyles.modal}>
-        <div className={PopupStyles.modalContent}>
-          <div className={PopupStyles.modalTitle}>
-            <h1>{title} : {symbol}</h1>
-            <span className={PopupStyles.modalSubtitle}>{subtitle}</span>
-          </div>
 
-          {!isMarketOpen && (
-            <div style={{
-              background: "#fff8e1",
-              border: "1px solid #f3ca3e",
-              borderRadius: "8px",
-              padding: "10px 14px",
-              fontSize: "12px",
-              color: "#7a5f00",
-              marginBottom: "16px",
-              display: "flex",
-              alignItems: "flex-start",
-              gap: "8px",
-            }}>
-              <span style={{ fontSize: "14px", flexShrink: 0 }}>⏳</span>
-              <span>{t.marketClosed}</span>
-            </div>
-          )}
-
-          <div className={PopupStyles.inputNumberWrapper}>
-            <button className={PopupStyles.decrease} onClick={decrement}>-</button>
-            <input
-              type="number"
-              step={step}
-              max={maxCount}
-              value={count}
-              onChange={handleChange}
-              onBlur={() => {
-                let n = Number(count);
-                if (n > maxCount) n = maxCount;
-                if (n < 0) n = 0;
-                setCount(n.toFixed(precision));
-              }}
-            />
-            <button className={PopupStyles.increase} onClick={increment}>+</button>
-          </div>
-
-          {sell && (
-            <button
-              className={PopupStyles.sellAllLink}
-              onClick={() => setCount(Number(maxCount).toFixed(precision))}
-            >
-              {t.btn_sell_all}
-            </button>
-          )}
-
-          <button
-            className={PopupStyles.buttonBuy}
-            onClick={executeOrder}
-            disabled={isLoading}
-            style={{ opacity: isLoading ? 0.6 : 1, cursor: isLoading ? 'not-allowed' : 'pointer' }}
-          >
-            {isLoading ? "..." : (sell ? t.btnSell : t.btnBuy)}
-          </button>
-        </div>
-
-        <div className={PopupStyles.modalFooter}>
-          <button className={PopupStyles.closeLink} onClick={close}>
-            {t.btnClose}
-          </button>
-        </div>
-      </div>
     </div>
   );
 }
